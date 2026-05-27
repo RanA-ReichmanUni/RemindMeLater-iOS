@@ -1,16 +1,19 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/reminder.dart';
 import 'models/timeframe.dart';
 import 'providers/reminder_provider.dart';
 import 'services/notification_service.dart';
+import 'services/remote_config_service.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/screens/terms_screen.dart';
 import 'ui/screens/dump_screen.dart';
 import 'ui/screens/reminders_screen.dart';
 import 'ui/screens/alarm_screen.dart';
 import 'ui/screens/menu_screen.dart';
+import 'ui/screens/update_wall_screen.dart';
 import 'ui/components/comfort_hours_sheet.dart';
 
 void main() async {
@@ -19,18 +22,33 @@ void main() async {
   // Initialize services
   await NotificationService.instance.init();
 
+  bool needsUpdate = false;
+  try {
+    debugPrint("[Main] Initializing Firebase...");
+    await Firebase.initializeApp();
+    debugPrint("[Main] Firebase initialized. Initializing Remote Config...");
+    await RemoteConfigService.instance.init();
+    debugPrint("[Main] Remote Config initialized. Checking if update is required...");
+    needsUpdate = await RemoteConfigService.instance.isUpdateRequired();
+    debugPrint("[Main] needsUpdate = $needsUpdate");
+  } catch (e, stackTrace) {
+    debugPrint("[Main] Firebase/RemoteConfig initialization skipped or failed: $e");
+    debugPrint("[Main] Stack trace: $stackTrace");
+  }
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ReminderProvider()),
       ],
-      child: const RemindMeLaterApp(),
+      child: RemindMeLaterApp(needsUpdate: needsUpdate),
     ),
   );
 }
 
 class RemindMeLaterApp extends StatelessWidget {
-  const RemindMeLaterApp({super.key});
+  final bool needsUpdate;
+  const RemindMeLaterApp({super.key, required this.needsUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +60,7 @@ class RemindMeLaterApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.system,
-          home: const MainOrchestrator(),
+          home: MainOrchestrator(needsUpdate: needsUpdate),
         );
       },
     );
@@ -50,7 +68,8 @@ class RemindMeLaterApp extends StatelessWidget {
 }
 
 class MainOrchestrator extends StatefulWidget {
-  const MainOrchestrator({super.key});
+  final bool needsUpdate;
+  const MainOrchestrator({super.key, required this.needsUpdate});
 
   @override
   State<MainOrchestrator> createState() => _MainOrchestratorState();
@@ -80,6 +99,11 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
     final provider = Provider.of<ReminderProvider>(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+
+    // ── 0. If update is required, show Update Wall Screen ──
+    if (widget.needsUpdate) {
+      return const UpdateWallScreen();
+    }
 
     // ── 1. If foreground alarm active, show Alarm Screen ──
     if (_activeForegroundAlarm != null) {

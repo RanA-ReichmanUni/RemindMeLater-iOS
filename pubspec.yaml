@@ -21,6 +21,9 @@ dependencies:
   flutter_timezone: ^2.0.1
   flutter_ringtone_player: ^3.2.0
   url_launcher: ^6.2.5
+  firebase_core: ^4.9.0
+  firebase_remote_config: ^6.5.1
+  package_info_plus: ^10.1.0
 
 
 dev_dependencies:
