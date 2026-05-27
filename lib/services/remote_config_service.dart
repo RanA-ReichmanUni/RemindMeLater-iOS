@@ -20,7 +20,6 @@ class RemoteConfigService {
 
   Future<void> init() async {
     try {
-      debugPrint("[RemoteConfig] Setting config settings...");
       await _remoteConfig.setConfigSettings(RemoteConfigSettings(
         fetchTimeout: const Duration(seconds: 10),
         minimumFetchInterval: kDebugMode ? Duration.zero : const Duration(hours: 1),
@@ -33,15 +32,12 @@ class RemoteConfigService {
         'play_store_url': 'https://play.google.com/store/apps/details?id=com.impactdevelopment.remind_me_later',
       });
 
-      debugPrint("[RemoteConfig] Fetching and activating...");
-      final bool activated = await _remoteConfig.fetchAndActivate();
-      debugPrint("[RemoteConfig] fetchAndActivate completed. Activated new values: $activated");
+      await _remoteConfig.fetchAndActivate();
 
       _minRequiredVersion = _remoteConfig.getString('min_required_version');
       _appStoreUrl = _remoteConfig.getString('app_store_url');
       _playStoreUrl = _remoteConfig.getString('play_store_url');
       _isInitialized = true;
-      debugPrint("[RemoteConfig] Initialized. min_required_version = '$_minRequiredVersion'");
     } catch (e, stackTrace) {
       debugPrint("[RemoteConfig] ERROR during initialization: $e");
       debugPrint("[RemoteConfig] Stack trace: $stackTrace");
@@ -49,20 +45,12 @@ class RemoteConfigService {
   }
 
   Future<bool> isUpdateRequired() async {
-    debugPrint("[RemoteConfig] isUpdateRequired called. isInitialized=$_isInitialized");
-    if (!_isInitialized) {
-      debugPrint("[RemoteConfig] Not initialized — skipping check, returning false.");
-      return false;
-    }
+    if (!_isInitialized) return false;
 
     try {
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final String currentVersion = packageInfo.version;
-      debugPrint("[RemoteConfig] Current app version: '$currentVersion', min required: '$_minRequiredVersion'");
-
-      final bool result = _isVersionLessThan(currentVersion, _minRequiredVersion);
-      debugPrint("[RemoteConfig] isUpdateRequired result: $result");
-      return result;
+      return _isVersionLessThan(currentVersion, _minRequiredVersion);
     } catch (e) {
       debugPrint("[RemoteConfig] Error checking version compatibility: $e");
       return false;

@@ -11,11 +11,13 @@ import '../../services/notification_service.dart';
 class AlarmScreen extends StatefulWidget {
   final Reminder reminder;
   final VoidCallback onDismiss;
+  final bool playSiren;
 
   const AlarmScreen({
     super.key,
     required this.reminder,
     required this.onDismiss,
+    this.playSiren = true,
   });
 
   @override
@@ -28,8 +30,10 @@ class _AlarmScreenState extends State<AlarmScreen> {
   @override
   void initState() {
     super.initState();
-    // Play default alarm tone on page load
-    _startRingtone();
+    // Play default alarm tone on page load only if requested
+    if (widget.playSiren) {
+      _startRingtone();
+    }
   }
 
   void _startRingtone() {

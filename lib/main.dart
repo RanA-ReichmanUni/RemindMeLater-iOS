@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,15 +25,11 @@ void main() async {
 
   bool needsUpdate = false;
   try {
-    debugPrint("[Main] Initializing Firebase...");
     await Firebase.initializeApp();
-    debugPrint("[Main] Firebase initialized. Initializing Remote Config...");
     await RemoteConfigService.instance.init();
-    debugPrint("[Main] Remote Config initialized. Checking if update is required...");
     needsUpdate = await RemoteConfigService.instance.isUpdateRequired();
-    debugPrint("[Main] needsUpdate = $needsUpdate");
   } catch (e, stackTrace) {
-    debugPrint("[Main] Firebase/RemoteConfig initialization skipped or failed: $e");
+    debugPrint("[Main] Firebase/RemoteConfig initialization failed: $e");
     debugPrint("[Main] Stack trace: $stackTrace");
   }
 
@@ -82,16 +79,53 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
   String? _prefillText;
   bool _showMenu = false;
   Reminder? _activeForegroundAlarm;
+  bool _playSiren = false;
+  Timer? _foregroundPollTimer;
 
   @override
   void initState() {
     super.initState();
-    // Listen to foreground alarm trigger events
+    // Listen to foreground alarm trigger events from clicks
     NotificationService.instance.alarmStream.listen((Reminder reminder) {
-      setState(() {
-        _activeForegroundAlarm = reminder;
-      });
+      if (mounted) {
+        setState(() {
+          _playSiren = false;
+          _activeForegroundAlarm = reminder;
+        });
+      }
     });
+
+    // Handle alarms triggered when app was completely closed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService.instance.consumePendingLaunchAlarm();
+    });
+
+    // Start a periodic timer to catch alarms if the app is already open
+    _foregroundPollTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _checkForegroundAlarms();
+    });
+  }
+
+  void _checkForegroundAlarms() {
+    if (!mounted || _activeForegroundAlarm != null) return;
+    final provider = Provider.of<ReminderProvider>(context, listen: false);
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    for (final reminder in provider.reminders) {
+      if (reminder.status == ReminderStatus.pending && reminder.scheduledAt <= now) {
+        setState(() {
+          _playSiren = true;
+          _activeForegroundAlarm = reminder;
+        });
+        break; // Only trigger one alarm at a time
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _foregroundPollTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -109,6 +143,7 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
     if (_activeForegroundAlarm != null) {
       return AlarmScreen(
         reminder: _activeForegroundAlarm!,
+        playSiren: _playSiren,
         onDismiss: () {
           setState(() {
             _activeForegroundAlarm = null;
@@ -117,15 +152,15 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
       );
     }
 
-    // ── 2. Agree to Terms and Conditions first ──
-    if (!provider.termsAccepted) {
+    // ── 2. Agree to Terms and Conditions first (also re-shown on new versions) ──
+    if (provider.termsNeedReagreement) {
+      final isReagreement = provider.termsAccepted; // already agreed once before
       return TermsScreen(
+        isReagreement: isReagreement,
         onAgree: () {
           provider.acceptTerms();
         },
-        onCancel: () {
-          exit(0);
-        },
+        onCancel: isReagreement ? null : () => exit(0),
       );
     }
 

@@ -4,12 +4,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 class TermsScreen extends StatelessWidget {
   final VoidCallback onAgree;
-  final VoidCallback onCancel;
+  final VoidCallback? onCancel;
+  final bool isReagreement;
 
   const TermsScreen({
     super.key,
     required this.onAgree,
-    required this.onCancel,
+    this.onCancel,
+    this.isReagreement = false,
   });
 
   Future<void> _launchUrl(String urlString) async {
@@ -60,11 +62,22 @@ class TermsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Agree to continue',
+                      isReagreement
+                          ? 'Policies Updated'
+                          : 'Agree to continue',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+                    if (isReagreement) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        'The app has been updated. Please review and accept the terms again to continue.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     RichText(
                       text: TextSpan(
@@ -100,17 +113,19 @@ class TermsScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     Row(
                       children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: onCancel,
-                            style: OutlinedButton.styleFrom(
-                              shape: RoundedCornerShape(16),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                        if (onCancel != null) ...[
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: onCancel,
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedCornerShape(16),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: const Text('Cancel'),
                             ),
-                            child: const Text('Cancel'),
                           ),
-                        ),
-                        const SizedBox(width: 10),
+                          const SizedBox(width: 10),
+                        ],
                         Expanded(
                           child: ElevatedButton(
                             onPressed: onAgree,

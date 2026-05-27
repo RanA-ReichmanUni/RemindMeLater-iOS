@@ -389,6 +389,62 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                       ),
                     ),
 
+                    // === TEST BUTTON: Fire alert in 1 min ===
+                    // (Easily comment/uncomment this entire block to toggle the test button)
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: buttonHeight,
+                      child: ElevatedButton(
+                        onPressed: _isTextEmpty
+                            ? null
+                            : () async {
+                                final text = _textController.text;
+                                if (text.trim().isEmpty) return;
+
+                                provider.scheduleInOneMinute(text);
+                                _textController.clear();
+                                _ignoreComfortHours = false;
+
+                                setState(() {
+                                  _showSuccess = true;
+                                });
+
+                                Timer(const Duration(milliseconds: 1800), () {
+                                  if (mounted) {
+                                    setState(() {
+                                      _showSuccess = false;
+                                    });
+                                  }
+                                });
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colors.secondary,
+                          disabledBackgroundColor: colors.surfaceVariant,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          elevation: _isTextEmpty ? 0 : 4,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Fire alert in 1 min',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: _isTextEmpty ? colors.onSurfaceVariant : colors.onSecondary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.bolt,
+                              color: _isTextEmpty ? colors.onSurfaceVariant : colors.onSecondary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // ========================================
+
                     if (!_isTextEmpty) ...[
                       const SizedBox(height: 8),
                       TextButton(

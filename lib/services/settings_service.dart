@@ -16,6 +16,7 @@ class SettingsService {
   static const String _keyComfortEnd = 'comfort_end';
   static const String _keyHasOnboarded = 'has_onboarded';
   static const String _keyTermsAccepted = 'terms_accepted';
+  static const String _keyTermsVersion = 'terms_version';
   static const String _keyBgAnimEnabled = 'bg_anim_enabled';
 
   Future<int> getComfortStart() async {
@@ -43,6 +44,12 @@ class SettingsService {
     return p.getBool(_keyBgAnimEnabled) ?? true;
   }
 
+  /// Returns the terms version the user last accepted (0 = never accepted).
+  Future<int> getAcceptedTermsVersion() async {
+    final p = await prefs;
+    return p.getInt(_keyTermsVersion) ?? 0;
+  }
+
   Future<void> saveComfortHours(int start, int end) async {
     final p = await prefs;
     await p.setInt(_keyComfortStart, start);
@@ -53,6 +60,11 @@ class SettingsService {
   Future<void> setTermsAccepted(bool accepted) async {
     final p = await prefs;
     await p.setBool(_keyTermsAccepted, accepted);
+  }
+
+  Future<void> setAcceptedTermsVersion(int version) async {
+    final p = await prefs;
+    await p.setInt(_keyTermsVersion, version);
   }
 
   Future<void> setBackgroundAnimationsEnabled(bool enabled) async {

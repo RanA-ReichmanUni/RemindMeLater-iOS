@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../config/app_config.dart';
 import '../database/database_helper.dart';
 import '../models/reminder.dart';
 import '../models/timeframe.dart';
@@ -16,6 +17,7 @@ class ReminderProvider with ChangeNotifier {
   bool _hasOnboarded = false;
   bool _termsAccepted = false;
   bool _backgroundAnimationsEnabled = true;
+  int _acceptedTermsVersion = 0; // version of terms user last agreed to
 
   // Getters
   List<Reminder> get reminders => _reminders;
@@ -24,6 +26,13 @@ class ReminderProvider with ChangeNotifier {
   bool get hasOnboarded => _hasOnboarded;
   bool get termsAccepted => _termsAccepted;
   bool get backgroundAnimationsEnabled => _backgroundAnimationsEnabled;
+
+  /// True when the user hasn't accepted terms yet (fresh install),
+  /// OR when kTermsVersion has been bumped since they last agreed.
+  bool get termsNeedReagreement {
+    if (!_termsAccepted) return true; // fresh install — always ask
+    return _acceptedTermsVersion < kTermsVersion;
+  }
 
   ReminderProvider() {
     _init();
@@ -40,6 +49,7 @@ class ReminderProvider with ChangeNotifier {
     _hasOnboarded = await _settings.getHasOnboarded();
     _termsAccepted = await _settings.getTermsAccepted();
     _backgroundAnimationsEnabled = await _settings.getBackgroundAnimationsEnabled();
+    _acceptedTermsVersion = await _settings.getAcceptedTermsVersion();
     notifyListeners();
   }
 
@@ -109,6 +119,7 @@ class ReminderProvider with ChangeNotifier {
 
   Future<void> acceptTerms() async {
     await _settings.setTermsAccepted(true);
+    await _settings.setAcceptedTermsVersion(kTermsVersion);
     await refreshSettings();
   }
 
@@ -119,16 +130,25 @@ class ReminderProvider with ChangeNotifier {
 
   /// Fires alarm in exactly 1 minute for testing purposes.
   Future<void> scheduleInOneMinute(String text) async {
-    final scheduledAt = DateTime.now().millisecondsSinceEpoch + 60000;
-    final reminder = Reminder(
-      text: text.trim().isEmpty ? 'Test reminder' : text.trim(),
-      timeframe: Timeframe.laterToday,
-      scheduledAt: scheduledAt,
-    );
-    final id = await _db.insertReminder(reminder);
-    final savedReminder = reminder.copyWith(id: id);
-
-    await _notifications.scheduleNotification(savedReminder);
-    await refreshReminders();
+    debugPrint('[ReminderProvider] scheduleInOneMinute called with text: "$text"');
+    try {
+      final scheduledAt = DateTime.now().millisecondsSinceEpoch + 60000;
+      final reminder = Reminder(
+        text: text.trim().isEmpty ? 'Test reminder' : text.trim(),
+        timeframe: Timeframe.laterToday,
+        scheduledAt: scheduledAt,
+      );
+      debugPrint('[ReminderProvider] Inserting test reminder into DB...');
+      final id = await _db.insertReminder(reminder);
+      debugPrint('[ReminderProvider] Test reminder inserted in DB with ID: $id');
+      
+      final savedReminder = reminder.copyWith(id: id);
+      await _notifications.scheduleNotification(savedReminder);
+      
+      await refreshReminders();
+      debugPrint('[ReminderProvider] scheduleInOneMinute complete');
+    } catch (e) {
+      debugPrint('[ReminderProvider] ERROR in scheduleInOneMinute: $e');
+    }
   }
 }

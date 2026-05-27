@@ -62,6 +62,15 @@ class NotificationService {
 
   Stream<Reminder> get alarmStream => _alarmStreamController.stream;
 
+  Reminder? pendingLaunchAlarm;
+
+  void consumePendingLaunchAlarm() {
+    if (pendingLaunchAlarm != null) {
+      _alarmStreamController.add(pendingLaunchAlarm!);
+      pendingLaunchAlarm = null;
+    }
+  }
+
   NotificationService._init();
 
   Future<void> init() async {
@@ -69,9 +78,10 @@ class NotificationService {
     try {
       final String timeZoneName = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(timeZoneName));
+      debugPrint('[NotificationService] Timezone set successfully to: $timeZoneName');
     } catch (e) {
-      // Fallback
       tz.setLocalLocation(tz.getLocation('UTC'));
+      debugPrint('[NotificationService] Timezone initialization failed, using UTC: $e');
     }
 
     // Android Settings
@@ -119,43 +129,16 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        final String? payload = response.payload;
-        if (payload == null) return;
-        final int? reminderId = int.tryParse(payload);
-        if (reminderId == null) return;
-
-        // If the user selects an action
-        if (response.actionId == 'action_done') {
-          await DatabaseHelper.instance.updateReminderStatus(reminderId, ReminderStatus.done);
-          await flutterLocalNotificationsPlugin.cancel(reminderId);
-        } else if (response.actionId == 'action_snooze') {
-          final db = DatabaseHelper.instance;
-          final settings = SettingsService.instance;
-          final reminder = await db.getReminderById(reminderId);
-          if (reminder != null) {
-            final comfortStart = await settings.getComfortStart();
-            final comfortEnd = await settings.getComfortEnd();
-            final newTime = computeRandomTime(Timeframe.laterToday, comfortStart, comfortEnd);
-            final updated = reminder.copyWith(
-              timeframe: Timeframe.laterToday,
-              scheduledAt: newTime,
-              status: ReminderStatus.pending,
-            );
-            await db.updateReminder(updated);
-            await scheduleNotification(updated);
-          }
-        } else {
-          // Normal click — trigger app alarm screen if reminder is pending
-          final db = DatabaseHelper.instance;
-          final reminder = await db.getReminderById(reminderId);
-          if (reminder != null && reminder.status == ReminderStatus.pending) {
-            _alarmStreamController.add(reminder);
-          }
-        }
-      },
+      onDidReceiveNotificationResponse: _handleNotificationResponse,
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
+
+    // Check if app was launched from a notification
+    final launchDetails = await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    if (launchDetails != null && launchDetails.didNotificationLaunchApp && launchDetails.notificationResponse != null) {
+      debugPrint('[NotificationService] App launched from notification payload');
+      await _handleNotificationResponse(launchDetails.notificationResponse!);
+    }
 
     // Request permissions for Android 13+
     if (Platform.isAndroid) {
@@ -164,60 +147,91 @@ class NotificationService {
               AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
     }
+
+    // Explicitly request permissions for iOS/macOS
+    if (Platform.isIOS || Platform.isMacOS) {
+      try {
+        final bool? granted = await flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<
+                IOSFlutterLocalNotificationsPlugin>()
+            ?.requestPermissions(
+              alert: true,
+              badge: true,
+              sound: true,
+            );
+        debugPrint('[NotificationService] iOS/Darwin permissions requested. Result: $granted');
+      } catch (e) {
+        debugPrint('[NotificationService] Error requesting iOS/Darwin notification permissions: $e');
+      }
+    }
   }
 
   Future<void> scheduleNotification(Reminder reminder) async {
     if (reminder.id == null) return;
 
-    final scheduledDate = tz.TZDateTime.fromMillisecondsSinceEpoch(
-      tz.local,
-      reminder.scheduledAt,
-    );
+    try {
+      final scheduledDate = tz.TZDateTime.fromMillisecondsSinceEpoch(
+        tz.local,
+        reminder.scheduledAt,
+      );
 
-    // If scheduled time has already passed, fire in 5 seconds to avoid silent loss
-    final now = tz.TZDateTime.now(tz.local);
-    final fireTime = scheduledDate.isBefore(now)
-        ? now.add(const Duration(seconds: 5))
-        : scheduledDate;
+      // If scheduled time has already passed, fire in 5 seconds to avoid silent loss
+      final now = tz.TZDateTime.now(tz.local);
+      final fireTime = scheduledDate.isBefore(now)
+          ? now.add(const Duration(seconds: 5))
+          : scheduledDate;
 
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-      'reminders_channel',
-      'Reminders',
-      channelDescription: 'Dump & Forget Reminders',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-      actions: <AndroidNotificationAction>[
-        AndroidNotificationAction('action_done', '✓ Done'),
-        AndroidNotificationAction('action_snooze', '💤 Snooze'),
-      ],
-    );
+      debugPrint('[NotificationService] Scheduling notification ID: ${reminder.id}');
+      debugPrint('[NotificationService] tz.local: ${tz.local.name}');
+      debugPrint('[NotificationService] Now is: $now');
+      debugPrint('[NotificationService] Scheduled Date: $scheduledDate');
+      debugPrint('[NotificationService] Fire time (computed): $fireTime');
 
-    const DarwinNotificationDetails iosNotificationDetails =
-        DarwinNotificationDetails(
-      categoryIdentifier: 'reminder_category',
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'reminders_channel',
+        'Reminders',
+        channelDescription: 'Dump & Forget Reminders',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+        actions: <AndroidNotificationAction>[
+          AndroidNotificationAction('action_done', '✓ Done'),
+          AndroidNotificationAction('action_snooze', '💤 Snooze'),
+        ],
+      );
 
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-      iOS: iosNotificationDetails,
-    );
+      const DarwinNotificationDetails iosNotificationDetails =
+          DarwinNotificationDetails(
+        categoryIdentifier: 'reminder_category',
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        interruptionLevel: InterruptionLevel.timeSensitive,
+        sound: 'Soft_Arrival_3Sec.wav',
+      );
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      reminder.id!,
-      'Reminder 🔔',
-      reminder.text,
-      fireTime,
-      notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      payload: reminder.id.toString(),
-    );
+      const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails,
+        iOS: iosNotificationDetails,
+      );
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        reminder.id!,
+        'Reminder 🔔',
+        reminder.text,
+        fireTime,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: reminder.id.toString(),
+      );
+      debugPrint('[NotificationService] Successfully scheduled notification ID ${reminder.id} at $fireTime');
+    } catch (e, stackTrace) {
+      debugPrint('[NotificationService] ERROR scheduling notification ID ${reminder.id}: $e');
+      debugPrint('[NotificationService] StackTrace: $stackTrace');
+    }
   }
 
   Future<void> cancelNotification(int id) async {
