@@ -237,6 +237,47 @@ class NotificationService {
   Future<void> cancelNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
   }
+
+  Future<void> _handleNotificationResponse(NotificationResponse response) async {
+    final String? payload = response.payload;
+    debugPrint('[NotificationService] _handleNotificationResponse payload: $payload, actionId: ${response.actionId}');
+    if (payload == null) return;
+    final int? reminderId = int.tryParse(payload);
+    if (reminderId == null) return;
+
+    // If the user selects an action
+    if (response.actionId == 'action_done') {
+      await DatabaseHelper.instance.updateReminderStatus(reminderId, ReminderStatus.done);
+      await flutterLocalNotificationsPlugin.cancel(reminderId);
+    } else if (response.actionId == 'action_snooze') {
+      final db = DatabaseHelper.instance;
+      final settings = SettingsService.instance;
+      final reminder = await db.getReminderById(reminderId);
+      if (reminder != null) {
+        final comfortStart = await settings.getComfortStart();
+        final comfortEnd = await settings.getComfortEnd();
+        final newTime = computeRandomTime(Timeframe.laterToday, comfortStart, comfortEnd);
+        final updated = reminder.copyWith(
+          timeframe: Timeframe.laterToday,
+          scheduledAt: newTime,
+          status: ReminderStatus.pending,
+        );
+        await db.updateReminder(updated);
+        await scheduleNotification(updated);
+      }
+    } else {
+      // Normal click — trigger app alarm screen if reminder is pending
+      final db = DatabaseHelper.instance;
+      final reminder = await db.getReminderById(reminderId);
+      if (reminder != null && reminder.status == ReminderStatus.pending) {
+        if (_alarmStreamController.hasListener) {
+          _alarmStreamController.add(reminder);
+        } else {
+          pendingLaunchAlarm = reminder;
+        }
+      }
+    }
+  }
 }
 
 int computeRandomTime(
