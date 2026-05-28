@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'models/reminder.dart';
 import 'models/timeframe.dart';
@@ -57,6 +59,21 @@ class RemindMeLaterApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.system,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('es'),
+            Locale('fr'),
+            Locale('de'),
+            Locale('ja'),
+            Locale('zh'),
+            Locale('he'),
+          ],
           home: MainOrchestrator(needsUpdate: needsUpdate),
         );
       },
@@ -278,7 +295,7 @@ class _PremiumBottomBar extends StatelessWidget {
           children: [
             Expanded(
               child: _PremiumNavItem(
-                label: 'Dump',
+                label: AppLocalizations.of(context).tabDump,
                 icon: Icons.create_outlined,
                 selectedIcon: Icons.create,
                 isSelected: selectedTab == AppTab.dump,
@@ -290,7 +307,7 @@ class _PremiumBottomBar extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: _PremiumNavItem(
-                label: 'Reminders',
+                label: AppLocalizations.of(context).tabReminders,
                 icon: Icons.notifications_none,
                 selectedIcon: Icons.notifications,
                 isSelected: selectedTab == AppTab.reminders,
@@ -412,7 +429,7 @@ class _MenuPillButton extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Menu',
+              AppLocalizations.of(context).menuLabel,
               style: theme.textTheme.labelLarge?.copyWith(
                 color: colors.onSurface,
                 fontWeight: FontWeight.bold,

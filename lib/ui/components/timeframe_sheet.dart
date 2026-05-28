@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/timeframe.dart';
 
 class TimeframeSheet extends StatefulWidget {
@@ -54,7 +55,8 @@ class _TimeframeSheetState extends State<TimeframeSheet> {
     return '$h:00 $suffix';
   }
 
-  String _buildWarningMessage() {
+  String _buildWarningMessage(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
     final nowMin = now.hour * 60 + now.minute;
     final nightShift = widget.comfortEnd <= widget.comfortStart;
@@ -63,34 +65,30 @@ class _TimeframeSheetState extends State<TimeframeSheet> {
       final remaining = nowMin >= widget.comfortStart * 60
           ? (24 * 60 - nowMin) + widget.comfortEnd * 60
           : widget.comfortEnd * 60 - nowMin;
-      return 'Only $remaining minute${remaining == 1 ? "" : "s"} left in your overnight comfort window. '
-          'Send it before your window closes, or push it to tonight?';
+      return l10n.warningMinutesLeft(remaining, remaining == 1 ? '' : 's');
     }
 
     if (nowMin < widget.comfortStart * 60) {
-      return "Your comfort hours haven't kicked in yet — they start at ${_to12h(widget.comfortStart)}. "
-          "Want this alert to fire outside your quiet window anyway?";
+      return l10n.warningNotStarted(_to12h(widget.comfortStart));
     } else if (nowMin >= widget.comfortEnd * 60) {
-      return "You're currently outside your comfort hours — they ended at ${_to12h(widget.comfortEnd)} today. "
-          "Send the alert today anyway, or reschedule it for tomorrow morning?";
+      return l10n.warningEnded(_to12h(widget.comfortEnd));
     } else {
       final remaining = widget.comfortEnd * 60 - nowMin;
-      return "Only $remaining minute${remaining == 1 ? "" : "s"} left in your comfort window. "
-          "The reminder might arrive right as your quiet time starts. "
-          "Send it today anyway, or push it to tomorrow morning?";
+      return l10n.warningAlmostOver(remaining, remaining == 1 ? '' : 's');
     }
   }
 
-  void _showComfortWarning() {
+  void _showComfortWarning(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
+        final l10n = AppLocalizations.of(context);
         final colors = Theme.of(context).colorScheme;
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: const Text('Outside your comfort hours'),
-          content: Text(_buildWarningMessage()),
+          title: Text(l10n.outsideComfortHours),
+          content: Text(_buildWarningMessage(context)),
           actions: [
             TextButton(
               onPressed: () {
@@ -98,7 +96,7 @@ class _TimeframeSheetState extends State<TimeframeSheet> {
                 widget.onSelected(Timeframe.laterToday, false);
                 widget.onDismiss();
               },
-              child: const Text('Schedule for tomorrow'),
+              child: Text(l10n.scheduleForTomorrow),
             ),
             ElevatedButton(
               onPressed: () {
@@ -111,7 +109,7 @@ class _TimeframeSheetState extends State<TimeframeSheet> {
                 foregroundColor: colors.onPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Alert me anyway'),
+              child: Text(l10n.alertMeAnyway),
             ),
           ],
         );
@@ -136,14 +134,14 @@ class _TimeframeSheetState extends State<TimeframeSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Timing vibe',
+            AppLocalizations.of(context).timingVibeTitle,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'When should future-you deal with this?',
+            AppLocalizations.of(context).timingVibeSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -153,9 +151,9 @@ class _TimeframeSheetState extends State<TimeframeSheet> {
             selected: widget.selected,
             onSelected: (timeframe) {
               if (timeframe == Timeframe.laterToday && _isOutsideOrNearComfortEnd()) {
-                // Dimiss sheet first, then show warning
+                // Dismiss sheet first, then show warning
                 Navigator.of(context).pop();
-                _showComfortWarning();
+                _showComfortWarning(context);
               } else {
                 Navigator.of(context).pop();
                 widget.onSelected(timeframe, false);
@@ -217,26 +215,7 @@ class _TimeframeTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    final String emoji;
-    final String subtitle;
-    switch (timeframe) {
-      case Timeframe.laterToday:
-        emoji = '⚡';
-        subtitle = 'Soon-ish';
-        break;
-      case Timeframe.nextFewDays:
-        emoji = '🌤';
-        subtitle = 'Not right now';
-        break;
-      case Timeframe.nextWeeks:
-        emoji = '🌙';
-        subtitle = 'When life calms down';
-        break;
-      case Timeframe.nextMonth:
-        emoji = '🌊';
-        subtitle = 'Future me problem';
-        break;
-    }
+    final String subtitle = timeframe.localizedSubtitle(context);
 
     return GestureDetector(
       onTap: onClick,
@@ -269,7 +248,7 @@ class _TimeframeTile extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(emoji, style: const TextStyle(fontSize: 24)),
+                Text(timeframe.emoji, style: const TextStyle(fontSize: 24)),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 220),
                   width: 32,
@@ -283,7 +262,7 @@ class _TimeframeTile extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              timeframe.label,
+              timeframe.localizedLabel(context),
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: isSelected ? colors.onPrimaryContainer : colors.onSurface,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../models/reminder.dart';
 import '../../models/timeframe.dart';
@@ -74,7 +75,10 @@ class _RemindersScreenState extends State<RemindersScreen> {
               // Screen Header
               _ScreenHeader(
                 count: reminders.length,
-                comfortLabel: 'Comfort ${_formatHour(provider.comfortStart)} - ${_formatHour(provider.comfortEnd)}',
+                comfortLabel: AppLocalizations.of(context).comfortWindowLabel(
+                  _formatHour(provider.comfortStart),
+                  _formatHour(provider.comfortEnd),
+                ),
                 onComfortClick: () => _openComfortHoursSheet(context, provider),
                 theme: theme,
                 colors: colors,
@@ -98,7 +102,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                                     _displayCount += 10;
                                   });
                                 },
-                                child: Text('Load more ($remaining remaining)'),
+                                child: Text(AppLocalizations.of(context).loadMore(remaining)),
                               ),
                             );
                           }
@@ -161,7 +165,7 @@ class _ScreenHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'DUMP & FORGET',
+              AppLocalizations.of(context).dumpForgetHeader,
               style: theme.textTheme.labelMedium?.copyWith(
                 color: colors.primary,
                 fontWeight: FontWeight.bold,
@@ -169,7 +173,7 @@ class _ScreenHeader extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Chaos queue',
+              AppLocalizations.of(context).chaosQueue,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 fontSize: 22,
@@ -177,7 +181,9 @@ class _ScreenHeader extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              count == 1 ? 'I’m tracking 1 thing for you' : 'I’m tracking $count things for you',
+              count == 1
+                  ? AppLocalizations.of(context).trackingOne
+                  : AppLocalizations.of(context).trackingCount(count),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
@@ -265,14 +271,15 @@ class _ReminderCardState extends State<_ReminderCard> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final l10n = AppLocalizations.of(context);
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: const Text('Mark as handled?'),
-          content: const Text('This reminder will be removed from your active queue.'),
+          title: Text(l10n.markAsHandled),
+          content: Text(l10n.markHandledBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -284,7 +291,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                 foregroundColor: widget.colors.onPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Yes, handled'),
+              child: Text(l10n.yesHandled),
             ),
           ],
         );
@@ -368,7 +375,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
                     icon: const Icon(Icons.done, size: 18),
-                    label: const Text('Handled', style: TextStyle(fontWeight: FontWeight.bold)),
+                    label: Text(AppLocalizations.of(context).handled, style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -386,7 +393,10 @@ class _ReminderCardState extends State<_ReminderCard> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
                     icon: Icon(_expanded ? Icons.close : Icons.notifications, size: 18),
-                    label: Text(_expanded ? 'Close' : 'Delay', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    label: Text(
+                      _expanded ? AppLocalizations.of(context).close : AppLocalizations.of(context).delay,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
@@ -402,7 +412,7 @@ class _ReminderCardState extends State<_ReminderCard> {
                       children: [
                         const SizedBox(height: 12),
                         Text(
-                          'Cool, kick it to:',
+                          AppLocalizations.of(context).coolKickTo,
                           style: widget.theme.textTheme.labelMedium?.copyWith(
                             color: widget.colors.onSurfaceVariant,
                           ),
@@ -513,7 +523,7 @@ class _DelayButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
         ),
         child: Text(
-          option.label,
+          option.localizedLabel(context),
           style: TextStyle(
             color: isSelected ? colors.primary : colors.onSurfaceVariant,
             fontSize: 12,
@@ -547,14 +557,14 @@ class _EmptyState extends StatelessWidget {
               const Text('🧭', style: TextStyle(fontSize: 48)),
               const SizedBox(height: 8),
               Text(
-                'Zero chaos in the queue',
+                AppLocalizations.of(context).zeroChaosin,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Brain-dump on the other tab. I’ll take it from there.',
+                AppLocalizations.of(context).brainDumpOther,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: colors.onSurfaceVariant,

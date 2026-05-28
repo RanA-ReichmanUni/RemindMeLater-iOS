@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:provider/provider.dart';
 import '../../database/database_helper.dart';
@@ -181,7 +182,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'You wanted to be reminded about this.',
+                      AppLocalizations.of(context).youWantedReminded,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colors.onSurfaceVariant,
@@ -217,34 +218,34 @@ class _AlarmScreenState extends State<AlarmScreen> {
                                       Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                                         child: Text(
-                                          'Snooze until…',
+                                          AppLocalizations.of(context).snoozeUntil,
                                           style: theme.textTheme.labelLarge?.copyWith(
                                             color: colors.onSurfaceVariant,
                                           ),
                                         ),
                                       ),
                                       _SnoozeRow(
-                                        label: '⚡ Later today',
+                                        label: AppLocalizations.of(context).snoozeLaterToday,
                                         onClick: () => _handleSnooze(provider, Timeframe.laterToday),
                                         colors: colors,
                                       ),
                                       _SnoozeRow(
-                                        label: '🌅 Tomorrow',
+                                        label: AppLocalizations.of(context).snoozeTomorrow,
                                         onClick: () => _handleSnoozeTomorrow(provider),
                                         colors: colors,
                                       ),
                                       _SnoozeRow(
-                                        label: '🌤 Next few days',
+                                        label: AppLocalizations.of(context).snoozeNextFewDays,
                                         onClick: () => _handleSnooze(provider, Timeframe.nextFewDays),
                                         colors: colors,
                                       ),
                                       _SnoozeRow(
-                                        label: '🌙 Next weeks',
+                                        label: AppLocalizations.of(context).snoozeNextWeeks,
                                         onClick: () => _handleSnooze(provider, Timeframe.nextWeeks),
                                         colors: colors,
                                       ),
                                       _SnoozeRow(
-                                        label: '🌊 Next month',
+                                        label: AppLocalizations.of(context).snoozeNextMonth,
                                         onClick: () => _handleSnooze(provider, Timeframe.nextMonth),
                                         colors: colors,
                                       ),
@@ -271,9 +272,9 @@ class _AlarmScreenState extends State<AlarmScreen> {
                                 ),
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                               ),
-                              child: const Text(
-                                '✓  Done',
-                                style: TextStyle(
+                              child: Text(
+                                AppLocalizations.of(context).doneBtn,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
@@ -296,7 +297,9 @@ class _AlarmScreenState extends State<AlarmScreen> {
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                               ),
                               child: Text(
-                                _showSnoozeOptions ? '✕  Cancel' : '💤  Snooze',
+                                _showSnoozeOptions
+                                    ? AppLocalizations.of(context).cancelSnooze
+                                    : AppLocalizations.of(context).snoozeBtn,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: colors.primary,

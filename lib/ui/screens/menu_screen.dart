@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../providers/reminder_provider.dart';
@@ -63,13 +64,13 @@ class MenuScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Menu',
+                                AppLocalizations.of(context).menuLabel,
                                 style: theme.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
                               Text(
-                                'Options',
+                                AppLocalizations.of(context).menuOptions,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: colors.onSurfaceVariant,
                                 ),
@@ -102,14 +103,14 @@ class MenuScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Text(
-                                'Background animation',
+                                AppLocalizations.of(context).backgroundAnimation,
                                 style: theme.textTheme.labelLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Subtle motion behind the dump screen',
+                                AppLocalizations.of(context).backgroundAnimationSubtitle,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: colors.onSurfaceVariant,
                                 ),
@@ -131,7 +132,7 @@ class MenuScreen extends StatelessWidget {
                                               elevation: 0,
                                             ),
                                             icon: const Icon(Icons.motion_photos_on, size: 18),
-                                            label: const Text('On'),
+                                            label: Text(AppLocalizations.of(context).onLabel),
                                           )
                                         : OutlinedButton.icon(
                                             onPressed: () => provider.setBackgroundAnimationsEnabled(true),
@@ -142,7 +143,7 @@ class MenuScreen extends StatelessWidget {
                                               ),
                                             ),
                                             icon: const Icon(Icons.motion_photos_on, size: 18),
-                                            label: const Text('On'),
+                                            label: Text(AppLocalizations.of(context).onLabel),
                                           ),
                                   ),
                                   const SizedBox(width: 10),
@@ -160,7 +161,7 @@ class MenuScreen extends StatelessWidget {
                                               elevation: 0,
                                             ),
                                             icon: const Icon(Icons.motion_photos_off, size: 18),
-                                            label: const Text('Off'),
+                                            label: Text(AppLocalizations.of(context).offLabel),
                                           )
                                         : OutlinedButton.icon(
                                             onPressed: () => provider.setBackgroundAnimationsEnabled(false),
@@ -171,7 +172,7 @@ class MenuScreen extends StatelessWidget {
                                               ),
                                             ),
                                             icon: const Icon(Icons.motion_photos_off, size: 18),
-                                            label: const Text('Off'),
+                                            label: Text(AppLocalizations.of(context).offLabel),
                                           ),
                                   ),
                                 ],
@@ -187,7 +188,7 @@ class MenuScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Legal',
+                            AppLocalizations.of(context).legalLabel,
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: legalColor,
                               fontSize: 10,
@@ -203,7 +204,7 @@ class MenuScreen extends StatelessWidget {
                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: Text(
-                                  'Privacy Policy',
+                                  AppLocalizations.of(context).privacyPolicy,
                                   style: theme.textTheme.labelMedium?.copyWith(color: legalColor),
                                 ),
                               ),
@@ -216,7 +217,7 @@ class MenuScreen extends StatelessWidget {
                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: Text(
-                                  'Terms',
+                                  AppLocalizations.of(context).termsLabel,
                                   style: theme.textTheme.labelMedium?.copyWith(color: legalColor),
                                 ),
                               ),

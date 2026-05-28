@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ComfortHoursSheet extends StatefulWidget {
   final int initialStart;
@@ -58,14 +59,14 @@ class _ComfortHoursSheetState extends State<ComfortHoursSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Comfort hours',
+            AppLocalizations.of(context).comfortHoursTitle,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            "We'll only send reminders during these hours — so you're never bothered outside your day.",
+            AppLocalizations.of(context).comfortHoursSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -74,7 +75,7 @@ class _ComfortHoursSheetState extends State<ComfortHoursSheet> {
           
           // From Stepper
           _HourStepper(
-            label: 'From',
+            label: AppLocalizations.of(context).fromLabel,
             hour: start,
             format: formatHour,
             onDecrease: () {
@@ -92,7 +93,7 @@ class _ComfortHoursSheetState extends State<ComfortHoursSheet> {
           
           // Until Stepper
           _HourStepper(
-            label: 'Until',
+            label: AppLocalizations.of(context).untilLabel,
             hour: end,
             format: formatHour,
             onDecrease: () {
@@ -110,7 +111,7 @@ class _ComfortHoursSheetState extends State<ComfortHoursSheet> {
 
           if (isSpansOvernight) ...[
             Text(
-              'Spans overnight — comfort window crosses midnight (night shift).',
+              AppLocalizations.of(context).spansOvernight,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colors.primary,
               ),
@@ -128,7 +129,7 @@ class _ComfortHoursSheetState extends State<ComfortHoursSheet> {
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(AppLocalizations.of(context).saveBtn, style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

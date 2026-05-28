@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/remote_config_service.dart';
 import '../components/animated_backdrop.dart';
@@ -72,7 +73,7 @@ class UpdateWallScreen extends StatelessWidget {
 
                         // Title
                         Text(
-                          'Update Required',
+                          AppLocalizations.of(context).updateRequired,
                           textAlign: TextAlign.center,
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w900,
@@ -84,7 +85,7 @@ class UpdateWallScreen extends StatelessWidget {
 
                         // Message
                         Text(
-                          'A new version of Remind Me Later is available. Please update to the latest version to continue using the app.',
+                          AppLocalizations.of(context).updateMessage,
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colors.onSurfaceVariant,
@@ -113,8 +114,8 @@ class UpdateWallScreen extends StatelessWidget {
                                 Icon(Icons.download_rounded, size: 20),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Update Now',
-                                  style: TextStyle(
+                                  AppLocalizations.of(context).updateNow,
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),

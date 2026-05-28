@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../models/timeframe.dart';
 import '../../providers/reminder_provider.dart';
@@ -210,7 +211,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                                 ),
                                 SizedBox(height: subtitleGap),
                                 Text(
-                                  "We'll ping you later, when it's more convenient.",
+                                  AppLocalizations.of(context).tagline,
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: colors.onSurfaceVariant,
@@ -254,7 +255,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      'Dump your chaos here',
+                                      AppLocalizations.of(context).dumpInputHeader,
                                       style: theme.textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -312,14 +313,14 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Timing vibe',
+                                    AppLocalizations.of(context).timingVibeLabel,
                                     style: theme.textTheme.labelLarge?.copyWith(
                                       color: colors.onSurfaceVariant,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    _selectedTimeframe.label,
+                                    _selectedTimeframe.localizedLabel(context),
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: colors.onSurface,
@@ -373,7 +374,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Remind Me Later',
+                              AppLocalizations.of(context).remindMeLaterBtn,
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: _isTextEmpty ? colors.onSurfaceVariant : colors.onPrimary,
@@ -389,71 +390,13 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                       ),
                     ),
 
-                    /*
-                    // === TEST BUTTON: Fire alert in 1 min ===
-                    // (Easily comment/uncomment this entire block to toggle the test button)
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: buttonHeight,
-                      child: ElevatedButton(
-                        onPressed: _isTextEmpty
-                            ? null
-                            : () async {
-                                final text = _textController.text;
-                                if (text.trim().isEmpty) return;
-
-                                provider.scheduleInOneMinute(text);
-                                _textController.clear();
-                                _ignoreComfortHours = false;
-
-                                setState(() {
-                                  _showSuccess = true;
-                                });
-
-                                Timer(const Duration(milliseconds: 1800), () {
-                                  if (mounted) {
-                                    setState(() {
-                                      _showSuccess = false;
-                                    });
-                                  }
-                                });
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colors.secondary,
-                          disabledBackgroundColor: colors.surfaceVariant,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          elevation: _isTextEmpty ? 0 : 4,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Fire alert in 1 min',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: _isTextEmpty ? colors.onSurfaceVariant : colors.onSecondary,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.bolt,
-                              color: _isTextEmpty ? colors.onSurfaceVariant : colors.onSecondary,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // ========================================
-                    */
-
                     if (!_isTextEmpty) ...[
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: () {
                           _textController.clear();
                         },
-                        child: const Text('Clear draft'),
+                        child: Text(AppLocalizations.of(context).clearDraft),
                       ),
                     ],
 
@@ -505,7 +448,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                               ),
                               const SizedBox(height: 14),
                               Text(
-                                'Got it!',
+                                AppLocalizations.of(context).gotIt,
                                 style: theme.textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.w900,
                                   color: colors.onSurface,
@@ -514,7 +457,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'We\'ll remind you later 🤙',
+                                AppLocalizations.of(context).wellRemindYouLater,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   color: colors.onSurfaceVariant,
                                 ),
@@ -619,7 +562,7 @@ class _ChaosPadState extends State<_ChaosPad> {
             ),
             cursorColor: widget.colors.primary,
             decoration: InputDecoration(
-              hintText: 'What\'s on your mind?',
+              hintText: AppLocalizations.of(context).dumpHintText,
               hintStyle: widget.theme.textTheme.bodyLarge?.copyWith(
                 color: widget.colors.onSurfaceVariant.withOpacity(0.75),
               ),

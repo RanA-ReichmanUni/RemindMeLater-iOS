@@ -1,0 +1,254 @@
+{
+  "@@locale": "en",
+
+  "tagline": "We'll ping you later, when it's more convenient.",
+  "@tagline": { "description": "Tagline under the app brand on the dump screen" },
+
+  "dumpInputHeader": "Dump your chaos here",
+  "@dumpInputHeader": { "description": "Header above the text input on the dump screen" },
+
+  "dumpHintText": "What's on your mind?",
+  "@dumpHintText": { "description": "Placeholder inside the text field" },
+
+  "timingVibeLabel": "Timing vibe",
+  "@timingVibeLabel": { "description": "Label for the timeframe selector card on the dump screen" },
+
+  "remindMeLaterBtn": "Remind Me Later",
+  "@remindMeLaterBtn": { "description": "Primary action button on the dump screen" },
+
+  "clearDraft": "Clear draft",
+  "@clearDraft": { "description": "Button to clear the text field" },
+
+  "gotIt": "Got it!",
+  "@gotIt": { "description": "Success overlay title after saving a reminder" },
+
+  "wellRemindYouLater": "We'll remind you later 🤙",
+  "@wellRemindYouLater": { "description": "Success overlay subtitle after saving a reminder" },
+
+  "tabDump": "Dump",
+  "@tabDump": { "description": "Bottom nav tab label for the dump screen" },
+
+  "tabReminders": "Reminders",
+  "@tabReminders": { "description": "Bottom nav tab label for the reminders screen" },
+
+  "menuLabel": "Menu",
+  "@menuLabel": { "description": "Menu button pill label and menu screen title" },
+
+  "menuOptions": "Options",
+  "@menuOptions": { "description": "Subtitle under the Menu heading" },
+
+  "backgroundAnimation": "Background animation",
+  "@backgroundAnimation": { "description": "Setting title for the animated backdrop toggle" },
+
+  "backgroundAnimationSubtitle": "Subtle motion behind the dump screen",
+  "@backgroundAnimationSubtitle": { "description": "Setting description for the animated backdrop toggle" },
+
+  "onLabel": "On",
+  "@onLabel": { "description": "Toggle option: On" },
+
+  "offLabel": "Off",
+  "@offLabel": { "description": "Toggle option: Off" },
+
+  "legalLabel": "Legal",
+  "@legalLabel": { "description": "Section heading for legal links in the menu" },
+
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": { "description": "Link text for the Privacy Policy" },
+
+  "termsLabel": "Terms",
+  "@termsLabel": { "description": "Link text for the Terms and Conditions" },
+
+  "dumpForgetHeader": "DUMP & FORGET",
+  "@dumpForgetHeader": { "description": "Small caps label at the top of the reminders screen header" },
+
+  "chaosQueue": "Chaos queue",
+  "@chaosQueue": { "description": "Reminders screen section title" },
+
+  "trackingOne": "I'm tracking 1 thing for you",
+  "@trackingOne": { "description": "Reminders count label when count is exactly 1" },
+
+  "trackingCount": "I'm tracking {count} things for you",
+  "@trackingCount": {
+    "description": "Reminders count label when count is not 1",
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "comfortWindowLabel": "Comfort {start} - {end}",
+  "@comfortWindowLabel": {
+    "description": "Comfort hours label shown as a pill on the reminders screen",
+    "placeholders": {
+      "start": { "type": "String" },
+      "end": { "type": "String" }
+    }
+  },
+
+  "loadMore": "Load more ({remaining} remaining)",
+  "@loadMore": {
+    "description": "Button to load more reminders in the list",
+    "placeholders": {
+      "remaining": { "type": "int" }
+    }
+  },
+
+  "markAsHandled": "Mark as handled?",
+  "@markAsHandled": { "description": "Dialog title when confirming a reminder is done" },
+
+  "markHandledBody": "This reminder will be removed from your active queue.",
+  "@markHandledBody": { "description": "Dialog body when confirming a reminder is done" },
+
+  "cancel": "Cancel",
+  "@cancel": { "description": "Generic cancel button" },
+
+  "yesHandled": "Yes, handled",
+  "@yesHandled": { "description": "Confirm button in the mark-as-handled dialog" },
+
+  "handled": "Handled",
+  "@handled": { "description": "Primary action button on a reminder card" },
+
+  "delay": "Delay",
+  "@delay": { "description": "Secondary action button on a reminder card to expand delay options" },
+
+  "close": "Close",
+  "@close": { "description": "Button to collapse the delay options on a reminder card" },
+
+  "coolKickTo": "Cool, kick it to:",
+  "@coolKickTo": { "description": "Label above the delay options grid on a reminder card" },
+
+  "zeroChaosin": "Zero chaos in the queue",
+  "@zeroChaosin": { "description": "Empty state title on the reminders screen" },
+
+  "brainDumpOther": "Brain-dump on the other tab. I'll take it from there.",
+  "@brainDumpOther": { "description": "Empty state subtitle on the reminders screen" },
+
+  "youWantedReminded": "You wanted to be reminded about this.",
+  "@youWantedReminded": { "description": "Subtitle on the alarm screen" },
+
+  "doneBtn": "✓  Done",
+  "@doneBtn": { "description": "Done button on the alarm screen" },
+
+  "snoozeBtn": "💤  Snooze",
+  "@snoozeBtn": { "description": "Snooze button on the alarm screen (collapsed state)" },
+
+  "cancelSnooze": "✕  Cancel",
+  "@cancelSnooze": { "description": "Cancel button on the alarm screen (snooze panel open)" },
+
+  "snoozeUntil": "Snooze until…",
+  "@snoozeUntil": { "description": "Header of the snooze options panel" },
+
+  "snoozeLaterToday": "⚡ Later today",
+  "@snoozeLaterToday": { "description": "Snooze option: later today" },
+
+  "snoozeTomorrow": "🌅 Tomorrow",
+  "@snoozeTomorrow": { "description": "Snooze option: tomorrow" },
+
+  "snoozeNextFewDays": "🌤 Next few days",
+  "@snoozeNextFewDays": { "description": "Snooze option: next few days" },
+
+  "snoozeNextWeeks": "🌙 Next weeks",
+  "@snoozeNextWeeks": { "description": "Snooze option: next weeks" },
+
+  "snoozeNextMonth": "🌊 Next month",
+  "@snoozeNextMonth": { "description": "Snooze option: next month" },
+
+  "comfortHoursTitle": "Comfort hours",
+  "@comfortHoursTitle": { "description": "Title of the comfort hours bottom sheet" },
+
+  "comfortHoursSubtitle": "We'll only send reminders during these hours — so you're never bothered outside your day.",
+  "@comfortHoursSubtitle": { "description": "Subtitle of the comfort hours bottom sheet" },
+
+  "fromLabel": "From",
+  "@fromLabel": { "description": "Label for the start-hour stepper" },
+
+  "untilLabel": "Until",
+  "@untilLabel": { "description": "Label for the end-hour stepper" },
+
+  "spansOvernight": "Spans overnight — comfort window crosses midnight (night shift).",
+  "@spansOvernight": { "description": "Warning shown when comfort hours span across midnight" },
+
+  "saveBtn": "Save",
+  "@saveBtn": { "description": "Save button in the comfort hours sheet" },
+
+  "timingVibeTitle": "Timing vibe",
+  "@timingVibeTitle": { "description": "Title of the timeframe picker bottom sheet" },
+
+  "timingVibeSubtitle": "When should future-you deal with this?",
+  "@timingVibeSubtitle": { "description": "Subtitle of the timeframe picker bottom sheet" },
+
+  "outsideComfortHours": "Outside your comfort hours",
+  "@outsideComfortHours": { "description": "Title of the comfort-hours warning dialog" },
+
+  "scheduleForTomorrow": "Schedule for tomorrow",
+  "@scheduleForTomorrow": { "description": "Action button in the comfort-hours warning dialog" },
+
+  "alertMeAnyway": "Alert me anyway",
+  "@alertMeAnyway": { "description": "Action button in the comfort-hours warning dialog" },
+
+  "laterTodayLabel": "Later today",
+  "@laterTodayLabel": { "description": "Timeframe tile label" },
+
+  "laterTodaySubtitle": "Soon-ish",
+  "@laterTodaySubtitle": { "description": "Timeframe tile subtitle" },
+
+  "nextFewDaysLabel": "Next few days",
+  "@nextFewDaysLabel": { "description": "Timeframe tile label" },
+
+  "nextFewDaysSubtitle": "Not right now",
+  "@nextFewDaysSubtitle": { "description": "Timeframe tile subtitle" },
+
+  "nextWeeksLabel": "Next weeks",
+  "@nextWeeksLabel": { "description": "Timeframe tile label" },
+
+  "nextWeeksSubtitle": "When life calms down",
+  "@nextWeeksSubtitle": { "description": "Timeframe tile subtitle" },
+
+  "nextMonthLabel": "Next month",
+  "@nextMonthLabel": { "description": "Timeframe tile label" },
+
+  "nextMonthSubtitle": "Future me problem",
+  "@nextMonthSubtitle": { "description": "Timeframe tile subtitle" },
+
+  "updateRequired": "Update Required",
+  "@updateRequired": { "description": "Title on the update wall screen" },
+
+  "updateMessage": "A new version of Remind Me Later is available. Please update to the latest version to continue using the app.",
+  "@updateMessage": { "description": "Body text on the update wall screen" },
+
+  "updateNow": "Update Now",
+  "@updateNow": { "description": "Button on the update wall screen" },
+
+  "warningMinutesLeft": "Only {remaining} minute{plural} left in your overnight comfort window. Send it before your window closes, or push it to tonight?",
+  "@warningMinutesLeft": {
+    "description": "Comfort hours warning: minutes remaining in overnight window",
+    "placeholders": {
+      "remaining": { "type": "int" },
+      "plural": { "type": "String" }
+    }
+  },
+
+  "warningNotStarted": "Your comfort hours haven't kicked in yet — they start at {startTime}. Want this alert to fire outside your quiet window anyway?",
+  "@warningNotStarted": {
+    "description": "Comfort hours warning: window hasn't started yet",
+    "placeholders": {
+      "startTime": { "type": "String" }
+    }
+  },
+
+  "warningEnded": "You're currently outside your comfort hours — they ended at {endTime} today. Send the alert today anyway, or reschedule it for tomorrow morning?",
+  "@warningEnded": {
+    "description": "Comfort hours warning: window has already ended today",
+    "placeholders": {
+      "endTime": { "type": "String" }
+    }
+  },
+
+  "warningAlmostOver": "Only {remaining} minute{plural} left in your comfort window. The reminder might arrive right as your quiet time starts. Send it today anyway, or push it to tomorrow morning?",
+  "@warningAlmostOver": {
+    "description": "Comfort hours warning: window is almost over",
+    "placeholders": {
+      "remaining": { "type": "int" },
+      "plural": { "type": "String" }
+    }
+  }
+}
