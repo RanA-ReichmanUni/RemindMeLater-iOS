@@ -389,6 +389,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                       ),
                     ),
 
+                    /*
                     // === TEST BUTTON: Fire alert in 1 min ===
                     // (Easily comment/uncomment this entire block to toggle the test button)
                     const SizedBox(height: 12),
@@ -444,6 +445,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                       ),
                     ),
                     // ========================================
+                    */
 
                     if (!_isTextEmpty) ...[
                       const SizedBox(height: 8),
