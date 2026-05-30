@@ -28,7 +28,7 @@ class RemoteConfigService {
       // Define local fallback defaults
       await _remoteConfig.setDefaults(<String, dynamic>{
         'min_required_version': '1.0.0',
-        'app_store_url': 'https://apps.apple.com/app/idYOUR_APP_ID',
+        'app_store_url': 'https://apps.apple.com/us/app/id6774295301',
         'play_store_url': 'https://play.google.com/store/apps/details?id=com.impactdevelopment.remind_me_later',
       });
 
