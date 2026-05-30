@@ -9,7 +9,7 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
-  String get tagline => 'נזכיר לך מאוחר יותר, כשיהיה נוח יותר.';
+  String get tagline => 'נזכיר לך מאוחר יותר, כשיהיה מתאים בשבילך.';
 
   @override
   String get dumpInputHeader => 'פרוק את הבלגן שלך כאן';
@@ -18,7 +18,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dumpHintText => 'מה עולה לך בראש?';
 
   @override
-  String get timingVibeLabel => 'מתי מתאים?';
+  String get timingVibeLabel => 'מתי הכי מתאים ?';
 
   @override
   String get remindMeLaterBtn => 'תזכיר לי אחר כך';
@@ -117,7 +117,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get zeroChaosin => 'אפס בלגן בתור';
 
   @override
-  String get brainDumpOther => 'פרוק בכרטיסייה האחרת. משם כבר אדאג להזכיר לך.';
+  String get brainDumpOther => 'פרוק בכרטיסייה האחרת. משם כבר אזכיר לך.';
 
   @override
   String get youWantedReminded => 'רצית שיזכירו לך על זה.';
@@ -154,7 +154,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get comfortHoursSubtitle =>
-      'נשלח תזכורות רק בשעות אלו — כדי שלא נפריע לך מחוץ לשגרת יומך.';
+      'נשלח תזכורות רק בשעות אלו, כדי שלא נפריע לך מחוץ לשגרת יומך.';
 
   @override
   String get fromLabel => 'מ־';
@@ -191,19 +191,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get laterTodaySubtitle => 'בקרוב';
 
   @override
-  String get nextFewDaysLabel => 'כמה ימים הקרובים';
+  String get nextFewDaysLabel => 'בימים הקרובים';
 
   @override
   String get nextFewDaysSubtitle => 'לא עכשיו';
 
   @override
-  String get nextWeeksLabel => 'השבועות הקרובים';
+  String get nextWeeksLabel => 'בשבועות הקרובים';
 
   @override
   String get nextWeeksSubtitle => 'כשהחיים ירגעו';
 
   @override
-  String get nextMonthLabel => 'החודש הבא';
+  String get nextMonthLabel => 'בחודש הבא';
 
   @override
   String get nextMonthSubtitle => 'בעיה של אני-העתידי';

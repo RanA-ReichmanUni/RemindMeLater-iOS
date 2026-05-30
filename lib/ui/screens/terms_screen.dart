@@ -55,92 +55,95 @@ class TermsScreen extends StatelessWidget {
             child: Card(
               shape: RoundedCornerShape(24),
               elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      isReagreement
-                          ? 'Policies Updated'
-                          : 'Agree to continue',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    if (isReagreement) ...[
-                      const SizedBox(height: 6),
+              child: Directionality(
+                textDirection: TextDirection.ltr,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 20.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                       Text(
-                        'The app has been updated. Please review and accept the terms again to continue.',
+                        isReagreement
+                            ? 'Policies Updated'
+                            : 'Agree to continue',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      if (isReagreement) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          'The app has been updated. Please review and accept the terms again to continue.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      RichText(
+                        text: TextSpan(
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurface,
+                          ),
+                          children: [
+                            const TextSpan(text: 'By using this app, you agree to the '),
+                            TextSpan(
+                              text: 'Terms and Conditions',
+                              style: textLinkStyle,
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => _launchUrl(termsLink),
+                            ),
+                            const TextSpan(text: ' and '),
+                            TextSpan(
+                              text: 'Privacy Policy',
+                              style: textLinkStyle,
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => _launchUrl(privacyLink),
+                            ),
+                            const TextSpan(text: '.'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'In addition to the policies agreement, please note that apps can make mistakes and alerts may not always fire. Do not rely on this app for important, critical or time-sensitive reminders.',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colors.onSurfaceVariant,
                         ),
                       ),
-                    ],
-                    const SizedBox(height: 12),
-                    RichText(
-                      text: TextSpan(
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colors.onSurface,
-                        ),
+                      const SizedBox(height: 24),
+                      Row(
                         children: [
-                          const TextSpan(text: 'By using this app, you agree to the '),
-                          TextSpan(
-                            text: 'Terms and Conditions',
-                            style: textLinkStyle,
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => _launchUrl(termsLink),
-                          ),
-                          const TextSpan(text: ' and '),
-                          TextSpan(
-                            text: 'Privacy Policy',
-                            style: textLinkStyle,
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => _launchUrl(privacyLink),
-                          ),
-                          const TextSpan(text: '.'),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'In addition to the policies agreement, please note that apps can make mistakes and alerts may not always fire. Do not rely on this app for important, critical or time-sensitive reminders.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        if (onCancel != null) ...[
+                          if (onCancel != null) ...[
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: onCancel,
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedCornerShape(16),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                ),
+                                child: const Text('Cancel'),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                          ],
                           Expanded(
-                            child: OutlinedButton(
-                              onPressed: onCancel,
-                              style: OutlinedButton.styleFrom(
+                            child: ElevatedButton(
+                              onPressed: onAgree,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colors.primary,
+                                foregroundColor: colors.onPrimary,
                                 shape: RoundedCornerShape(16),
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),
-                              child: const Text('Cancel'),
+                              child: const Text('I Read and Agreed'),
                             ),
                           ),
-                          const SizedBox(width: 10),
                         ],
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: onAgree,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colors.primary,
-                              foregroundColor: colors.onPrimary,
-                              shape: RoundedCornerShape(16),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                            child: const Text('I Read and Agreed'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

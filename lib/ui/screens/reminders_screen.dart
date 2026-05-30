@@ -164,11 +164,14 @@ class _ScreenHeader extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              AppLocalizations.of(context).dumpForgetHeader,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: colors.primary,
-                fontWeight: FontWeight.bold,
+            Directionality(
+              textDirection: TextDirection.ltr,
+              child: Text(
+                AppLocalizations.of(context).dumpForgetHeader,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 4),
@@ -209,10 +212,13 @@ class _ScreenHeader extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        comfortLabel,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: colors.onSurface,
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Text(
+                          comfortLabel,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colors.onSurface,
+                          ),
                         ),
                       ),
                       Icon(

@@ -190,33 +190,40 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                             ),
                             child: Column(
                               children: [
-                                Text(
-                                  'Dump & Forget:',
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                    color: colors.primary,
-                                    fontSize: 28,
-                                  ),
+                              Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Dump & Forget:',
+                                      textAlign: TextAlign.center,
+                                      style: theme.textTheme.headlineSmall?.copyWith(
+                                        fontWeight: FontWeight.w900,
+                                        color: colors.primary,
+                                        fontSize: 28,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Remind Me Later',
+                                      textAlign: TextAlign.center,
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: colors.onSurface.withOpacity(0.55),
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Remind Me Later',
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: colors.onSurface.withOpacity(0.55),
-                                    fontSize: 18,
-                                  ),
+                              ),
+                              SizedBox(height: subtitleGap),
+                              Text(
+                                AppLocalizations.of(context).tagline,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colors.onSurfaceVariant,
                                 ),
-                                SizedBox(height: subtitleGap),
-                                Text(
-                                  AppLocalizations.of(context).tagline,
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: colors.onSurfaceVariant,
-                                  ),
-                                ),
+                              ),
                               ],
                             ),
                           ),
