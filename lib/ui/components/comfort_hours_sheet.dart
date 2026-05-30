@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:remind_me_later/l10n/app_localizations.dart';
 
 class ComfortHoursSheet extends StatefulWidget {
   final int initialStart;

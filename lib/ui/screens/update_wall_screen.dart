@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:remind_me_later/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/remote_config_service.dart';
 import '../components/animated_backdrop.dart';
@@ -108,11 +108,11 @@ class UpdateWallScreen extends StatelessWidget {
                               ),
                               elevation: 4,
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.download_rounded, size: 20),
-                                SizedBox(width: 8),
+                                const Icon(Icons.download_rounded, size: 20),
+                                const SizedBox(width: 8),
                                 Text(
                                   AppLocalizations.of(context).updateNow,
                                   style: const TextStyle(
