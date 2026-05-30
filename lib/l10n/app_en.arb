@@ -250,5 +250,18 @@
       "remaining": { "type": "int" },
       "plural": { "type": "String" }
     }
-  }
+  },
+
+  "accessibilityTitle": "Accessibility Information",
+  "@accessibilityTitle": { "description": "Title of the accessibility details modal" },
+
+  "accessibilityButton": "Accessibility Info",
+  "@accessibilityButton": { "description": "Menu button to open accessibility details" },
+
+  "accessibilityExemptionText": "Accessibility Exemption Notice:\n\nRemind Me Later is developed by a sole independent developer. Our annual revenue falls below the statutory threshold requiring mandatory commercial digital accessibility adaptations.\n\nNevertheless, we believe in inclusivity and have voluntarily made an effort to implement screen reader compatibility, dynamic font scaling, and high-contrast themes. If you experience issues, please contact us and we will do our best to improve them.",
+  "@accessibilityExemptionText": { "description": "Legal exemption notice for indie/small businesses" },
+
+  "accessibilityClose": "Close",
+  "@accessibilityClose": { "description": "Close button for accessibility dialog" }
 }
+

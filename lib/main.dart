@@ -344,43 +344,54 @@ class _PremiumNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onClick,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        height: 54,
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colors.primaryContainer.withOpacity(0.45)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isSelected ? selectedIcon : icon,
-              size: isSelected ? 22 : 20,
-              color: isSelected ? colors.primary : colors.onSurfaceVariant,
-            ),
-            Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+    final double textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      hint: isSelected ? "Currently active tab" : "Double tap to switch to $label tab",
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onClick,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          height: 54 * textScale.clamp(1.0, 1.8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? colors.primaryContainer.withOpacity(0.45)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isSelected ? selectedIcon : icon,
+                size: (isSelected ? 22 : 20) * textScale.clamp(1.0, 1.4),
                 color: isSelected ? colors.primary : colors.onSurfaceVariant,
               ),
-            ),
-            if (isSelected)
+              const SizedBox(height: 2),
               Text(
-                '•',
-                style: TextStyle(
-                  color: colors.primary,
-                  height: 0.6,
-                  fontSize: 10,
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? colors.primary : colors.onSurfaceVariant,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-          ],
+              if (isSelected)
+                Text(
+                  '•',
+                  style: TextStyle(
+                    color: colors.primary,
+                    height: 0.6,
+                    fontSize: 10 * textScale.clamp(1.0, 1.4),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -400,44 +411,55 @@ class _MenuPillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onClick,
-      child: Container(
-        decoration: BoxDecoration(
-          color: colors.surface.withOpacity(0.96),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: colors.outlineVariant.withOpacity(0.6),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+    final double textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    return Semantics(
+      button: true,
+      label: AppLocalizations.of(context).menuLabel,
+      hint: "Opens settings and accessibility menu",
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onClick,
+        child: Container(
+          decoration: BoxDecoration(
+            color: colors.surface.withOpacity(0.96),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: colors.outlineVariant.withOpacity(0.6),
+              width: 1,
             ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.menu,
-              color: colors.onSurface,
-              size: 20,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              AppLocalizations.of(context).menuLabel,
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: colors.onSurface,
-                fontWeight: FontWeight.bold,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
-            ),
-          ],
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.0 * textScale.clamp(1.0, 1.5),
+            vertical: 8.0 * textScale.clamp(1.0, 1.5),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.menu,
+                color: colors.onSurface,
+                size: 20 * textScale.clamp(1.0, 1.4),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                AppLocalizations.of(context).menuLabel,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+

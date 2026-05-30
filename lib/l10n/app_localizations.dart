@@ -533,6 +533,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only {remaining} minute{plural} left in your comfort window. The reminder might arrive right as your quiet time starts. Send it today anyway, or push it to tomorrow morning?'**
   String warningAlmostOver(int remaining, String plural);
+
+  /// Title of the accessibility details modal
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility Information'**
+  String get accessibilityTitle;
+
+  /// Menu button to open accessibility details
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility Info'**
+  String get accessibilityButton;
+
+  /// Legal exemption notice for indie/small businesses
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility Exemption Notice:\n\nRemind Me Later is developed by a sole independent developer. Our annual revenue falls below the statutory threshold requiring mandatory commercial digital accessibility adaptations.\n\nNevertheless, we believe in inclusivity and have voluntarily made an effort to implement screen reader compatibility, dynamic font scaling, and high-contrast themes. If you experience issues, please contact us and we will do our best to improve them.'**
+  String get accessibilityExemptionText;
+
+  /// Close button for accessibility dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get accessibilityClose;
 }
 
 class _AppLocalizationsDelegate

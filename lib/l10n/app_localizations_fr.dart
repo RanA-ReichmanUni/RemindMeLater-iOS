@@ -240,4 +240,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String warningAlmostOver(int remaining, String plural) {
     return 'Il ne reste que $remaining minute$plural dans votre fenêtre de confort. Le rappel pourrait arriver juste au début de votre temps calme. L\'envoyer aujourd\'hui quand même, ou le reporter à demain ?';
   }
+
+  @override
+  String get accessibilityTitle => 'Accessibility Information';
+
+  @override
+  String get accessibilityButton => 'Accessibility Info';
+
+  @override
+  String get accessibilityExemptionText =>
+      'Accessibility Exemption Notice:\n\nRemind Me Later is developed by a sole independent developer. Our annual revenue falls below the statutory threshold requiring mandatory commercial digital accessibility adaptations.\n\nNevertheless, we believe in inclusivity and have voluntarily made an effort to implement screen reader compatibility, dynamic font scaling, and high-contrast themes. If you experience issues, please contact us and we will do our best to improve them.';
+
+  @override
+  String get accessibilityClose => 'Close';
 }

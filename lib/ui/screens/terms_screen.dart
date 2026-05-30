@@ -113,22 +113,27 @@ class TermsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          if (onCancel != null) ...[
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: onCancel,
-                                style: OutlinedButton.styleFrom(
-                                  shape: RoundedCornerShape(16),
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                ),
-                                child: const Text('Cancel'),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                          ],
-                          Expanded(
+                      Builder(
+                        builder: (context) {
+                          final useVerticalLayout = MediaQuery.textScalerOf(context).scale(1.0) > 1.4;
+                          final cancelBtn = onCancel != null
+                              ? Semantics(
+                                  button: true,
+                                  hint: "Cancels agreement and closes the application",
+                                  child: OutlinedButton(
+                                    onPressed: onCancel,
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedCornerShape(16),
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                    ),
+                                    child: const Text('Cancel'),
+                                  ),
+                                )
+                              : null;
+
+                          final agreeBtn = Semantics(
+                            button: true,
+                            hint: "Confirms agreement to policies and proceeds to the application",
                             child: ElevatedButton(
                               onPressed: onAgree,
                               style: ElevatedButton.styleFrom(
@@ -139,8 +144,31 @@ class TermsScreen extends StatelessWidget {
                               ),
                               child: const Text('I Read and Agreed'),
                             ),
-                          ),
-                        ],
+                          );
+
+                          if (useVerticalLayout) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                agreeBtn,
+                                if (cancelBtn != null) ...[
+                                  const SizedBox(height: 10),
+                                  cancelBtn,
+                                ],
+                              ],
+                            );
+                          } else {
+                            return Row(
+                              children: [
+                                if (cancelBtn != null) ...[
+                                  Expanded(child: cancelBtn),
+                                  const SizedBox(width: 10),
+                                ],
+                                Expanded(child: agreeBtn),
+                              ],
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),

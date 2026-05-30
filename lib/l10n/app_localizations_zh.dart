@@ -234,4 +234,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String warningAlmostOver(int remaining, String plural) {
     return '舒适时段仅剩 $remaining 分钟$plural。提醒可能正好在你的安静时间开始时到达。今天发送，还是推迟到明天？';
   }
+
+  @override
+  String get accessibilityTitle => 'Accessibility Information';
+
+  @override
+  String get accessibilityButton => 'Accessibility Info';
+
+  @override
+  String get accessibilityExemptionText =>
+      'Accessibility Exemption Notice:\n\nRemind Me Later is developed by a sole independent developer. Our annual revenue falls below the statutory threshold requiring mandatory commercial digital accessibility adaptations.\n\nNevertheless, we believe in inclusivity and have voluntarily made an effort to implement screen reader compatibility, dynamic font scaling, and high-contrast themes. If you experience issues, please contact us and we will do our best to improve them.';
+
+  @override
+  String get accessibilityClose => 'Close';
 }

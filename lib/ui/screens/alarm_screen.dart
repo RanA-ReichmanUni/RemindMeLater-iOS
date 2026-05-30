@@ -259,9 +259,12 @@ class _AlarmScreenState extends State<AlarmScreen> {
                       const SizedBox(height: 12),
 
                       // Bottom actions: Done and Snooze
-                      Row(
-                        children: [
-                          Expanded(
+                      Builder(
+                        builder: (context) {
+                          final useVerticalLayout = MediaQuery.textScalerOf(context).scale(1.0) > 1.4;
+                          final doneBtn = Semantics(
+                            button: true,
+                            hint: "Marks this reminder as completed and stops the alert",
                             child: ElevatedButton(
                               onPressed: () => _handleDone(provider),
                               style: ElevatedButton.styleFrom(
@@ -280,9 +283,13 @@ class _AlarmScreenState extends State<AlarmScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
+                          );
+
+                          final snoozeBtn = Semantics(
+                            button: true,
+                            hint: _showSnoozeOptions
+                                ? "Closes the snooze options panel"
+                                : "Expands the panel to snooze this reminder",
                             child: OutlinedButton(
                               onPressed: () {
                                 setState(() {
@@ -307,8 +314,27 @@ class _AlarmScreenState extends State<AlarmScreen> {
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          );
+
+                          if (useVerticalLayout) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                doneBtn,
+                                const SizedBox(height: 10),
+                                snoozeBtn,
+                              ],
+                            );
+                          } else {
+                            return Row(
+                              children: [
+                                Expanded(child: doneBtn),
+                                const SizedBox(width: 12),
+                                Expanded(child: snoozeBtn),
+                              ],
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),

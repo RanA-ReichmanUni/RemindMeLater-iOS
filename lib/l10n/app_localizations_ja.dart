@@ -235,4 +235,17 @@ class AppLocalizationsJa extends AppLocalizations {
   String warningAlmostOver(int remaining, String plural) {
     return '快適ウィンドウに残り$remaining分$pluralしかありません。静かな時間が始まる直前にリマインダーが届くかもしれません。今日送りますか、それとも明日に先延ばしますか？';
   }
+
+  @override
+  String get accessibilityTitle => 'Accessibility Information';
+
+  @override
+  String get accessibilityButton => 'Accessibility Info';
+
+  @override
+  String get accessibilityExemptionText =>
+      'Accessibility Exemption Notice:\n\nRemind Me Later is developed by a sole independent developer. Our annual revenue falls below the statutory threshold requiring mandatory commercial digital accessibility adaptations.\n\nNevertheless, we believe in inclusivity and have voluntarily made an effort to implement screen reader compatibility, dynamic font scaling, and high-contrast themes. If you experience issues, please contact us and we will do our best to improve them.';
+
+  @override
+  String get accessibilityClose => 'Close';
 }

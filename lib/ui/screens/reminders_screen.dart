@@ -192,41 +192,50 @@ class _ScreenHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: BorderSide(
-                  color: colors.onSecondaryContainer.withOpacity(0.2),
-                  width: 1.0,
+            Semantics(
+              button: true,
+              label: "Comfort hours: $comfortLabel",
+              hint: "Double tap to change your comfort hours window",
+              excludeSemantics: true,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: BorderSide(
+                    color: colors.onSecondaryContainer.withOpacity(0.2),
+                    width: 1.0,
+                  ),
                 ),
-              ),
-              color: colors.surface,
-              margin: EdgeInsets.zero,
-              elevation: 0,
-              borderOnForeground: true,
-              child: InkWell(
-                onTap: onComfortClick,
-                borderRadius: BorderRadius.circular(14),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: Text(
-                          comfortLabel,
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: colors.onSurface,
+                color: colors.surface,
+                margin: EdgeInsets.zero,
+                elevation: 0,
+                borderOnForeground: true,
+                child: InkWell(
+                  onTap: onComfortClick,
+                  borderRadius: BorderRadius.circular(14),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Text(
+                              comfortLabel,
+                              style: theme.textTheme.labelLarge?.copyWith(
+                                color: colors.onSurface,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      Icon(
-                        Icons.settings,
-                        size: 18,
-                        color: colors.onSurface,
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.settings,
+                          size: 18,
+                          color: colors.onSurface,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -368,9 +377,12 @@ class _ReminderCardState extends State<_ReminderCard> {
               ],
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
+            Builder(
+              builder: (context) {
+                final useVerticalLayout = MediaQuery.textScalerOf(context).scale(1.0) > 1.4;
+                final handledBtn = Semantics(
+                  button: true,
+                  hint: "Marks this reminder as completed and removes it from the queue",
                   child: ElevatedButton.icon(
                     onPressed: () => _showHandledConfirm(context),
                     style: ElevatedButton.styleFrom(
@@ -383,9 +395,11 @@ class _ReminderCardState extends State<_ReminderCard> {
                     icon: const Icon(Icons.done, size: 18),
                     label: Text(AppLocalizations.of(context).handled, style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
+                );
+
+                final delayBtn = Semantics(
+                  button: true,
+                  hint: _expanded ? "Collapses the delay options panel" : "Expands the panel to delay this reminder",
                   child: OutlinedButton.icon(
                     onPressed: () {
                       setState(() {
@@ -404,8 +418,27 @@ class _ReminderCardState extends State<_ReminderCard> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                ),
-              ],
+                );
+
+                if (useVerticalLayout) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      handledBtn,
+                      const SizedBox(height: 8),
+                      delayBtn,
+                    ],
+                  );
+                } else {
+                  return Row(
+                    children: [
+                      Expanded(child: handledBtn),
+                      const SizedBox(width: 10),
+                      Expanded(child: delayBtn),
+                    ],
+                  );
+                }
+              },
             ),
 
             // Delay options

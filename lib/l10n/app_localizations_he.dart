@@ -237,4 +237,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String warningAlmostOver(int remaining, String plural) {
     return 'נותרו רק $remaining דקו$plural בחלון הנוחות שלך. התזכורת עשויה להגיע ממש בתחילת זמן השקט שלך. לשלוח היום בכל זאת, או לדחות למחר?';
   }
+
+  @override
+  String get accessibilityTitle => 'מידע נגישות';
+
+  @override
+  String get accessibilityButton => 'מידע נגישות';
+
+  @override
+  String get accessibilityExemptionText =>
+      'הצהרת פטור מנגישות:\n\nהאפליקציה Remind Me Later מפותחת על ידי מפתח עצמאי יחיד. ההכנסה השנתית שלנו נמוכה מהסף החוקי המחייב התאמות נגישות דיגיטלית מסחריות לפי חוקי. \n\nעם זאת, אנו מאמינים בשוויון ונעשה מאמץ להטמיע בהתנדבות תאימות לקוראי מסך, התאמה לגודל גופן דינמי וערכות נושא בניגודיות גבוהה. אם נתקלתם בבעיה, אנא פנו אלינו ונעשה כמיטב יכולתנו לשפרה.';
+
+  @override
+  String get accessibilityClose => 'סגור';
 }

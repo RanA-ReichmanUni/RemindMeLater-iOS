@@ -16,6 +16,42 @@ class MenuScreen extends StatelessWidget {
     }
   }
 
+  void _openAccessibilityDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        final colors = Theme.of(context).colorScheme;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: Text(l10n.accessibilityTitle),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: SingleChildScrollView(
+              child: Text(
+                l10n.accessibilityExemptionText,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colors.primary,
+                foregroundColor: colors.onPrimary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(l10n.accessibilityClose),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -27,7 +63,7 @@ class MenuScreen extends StatelessWidget {
     const String privacyLink =
         'https://doc-hosting.flycricket.io/remind-me-later-dump-forget/26727942-d484-494a-a3b7-212119dfbe13/privacy';
 
-    final legalColor = colors.onSurfaceVariant.withOpacity(0.55);
+    final legalColor = colors.onSurfaceVariant; // Contrast fix (removed opacity)
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -79,6 +115,7 @@ class MenuScreen extends StatelessWidget {
                           ),
                           IconButton(
                             onPressed: onClose,
+                            tooltip: "Close menu",
                             icon: const Icon(Icons.close),
                           ),
                         ],
@@ -120,60 +157,70 @@ class MenuScreen extends StatelessWidget {
                                 children: [
                                   // ON Button
                                   Expanded(
-                                    child: provider.backgroundAnimationsEnabled
-                                        ? ElevatedButton.icon(
-                                            onPressed: () => provider.setBackgroundAnimationsEnabled(true),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: colors.primaryContainer,
-                                              foregroundColor: colors.onPrimaryContainer,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
+                                    child: Semantics(
+                                      button: true,
+                                      selected: provider.backgroundAnimationsEnabled,
+                                      hint: "Double tap to enable background animations",
+                                      child: provider.backgroundAnimationsEnabled
+                                          ? ElevatedButton.icon(
+                                              onPressed: () => provider.setBackgroundAnimationsEnabled(true),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: colors.primaryContainer,
+                                                foregroundColor: colors.onPrimaryContainer,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                elevation: 0,
                                               ),
-                                              elevation: 0,
-                                            ),
-                                            icon: const Icon(Icons.motion_photos_on, size: 18),
-                                            label: Text(AppLocalizations.of(context).onLabel),
-                                          )
-                                        : OutlinedButton.icon(
-                                            onPressed: () => provider.setBackgroundAnimationsEnabled(true),
-                                            style: OutlinedButton.styleFrom(
-                                              foregroundColor: colors.onSurface,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
+                                              icon: const Icon(Icons.motion_photos_on, size: 18),
+                                              label: Text(AppLocalizations.of(context).onLabel),
+                                            )
+                                          : OutlinedButton.icon(
+                                              onPressed: () => provider.setBackgroundAnimationsEnabled(true),
+                                              style: OutlinedButton.styleFrom(
+                                                foregroundColor: colors.onSurface,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
                                               ),
+                                              icon: const Icon(Icons.motion_photos_on, size: 18),
+                                              label: Text(AppLocalizations.of(context).onLabel),
                                             ),
-                                            icon: const Icon(Icons.motion_photos_on, size: 18),
-                                            label: Text(AppLocalizations.of(context).onLabel),
-                                          ),
+                                    ),
                                   ),
                                   const SizedBox(width: 10),
                                   // OFF Button
                                   Expanded(
-                                    child: !provider.backgroundAnimationsEnabled
-                                        ? ElevatedButton.icon(
-                                            onPressed: () => provider.setBackgroundAnimationsEnabled(false),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: colors.primaryContainer,
-                                              foregroundColor: colors.onPrimaryContainer,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
+                                    child: Semantics(
+                                      button: true,
+                                      selected: !provider.backgroundAnimationsEnabled,
+                                      hint: "Double tap to disable background animations",
+                                      child: !provider.backgroundAnimationsEnabled
+                                          ? ElevatedButton.icon(
+                                              onPressed: () => provider.setBackgroundAnimationsEnabled(false),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: colors.primaryContainer,
+                                                foregroundColor: colors.onPrimaryContainer,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                elevation: 0,
                                               ),
-                                              elevation: 0,
-                                            ),
-                                            icon: const Icon(Icons.motion_photos_off, size: 18),
-                                            label: Text(AppLocalizations.of(context).offLabel),
-                                          )
-                                        : OutlinedButton.icon(
-                                            onPressed: () => provider.setBackgroundAnimationsEnabled(false),
-                                            style: OutlinedButton.styleFrom(
-                                              foregroundColor: colors.onSurface,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
+                                              icon: const Icon(Icons.motion_photos_off, size: 18),
+                                              label: Text(AppLocalizations.of(context).offLabel),
+                                            )
+                                          : OutlinedButton.icon(
+                                              onPressed: () => provider.setBackgroundAnimationsEnabled(false),
+                                              style: OutlinedButton.styleFrom(
+                                                foregroundColor: colors.onSurface,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
                                               ),
+                                              icon: const Icon(Icons.motion_photos_off, size: 18),
+                                              label: Text(AppLocalizations.of(context).offLabel),
                                             ),
-                                            icon: const Icon(Icons.motion_photos_off, size: 18),
-                                            label: Text(AppLocalizations.of(context).offLabel),
-                                          ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -194,7 +241,8 @@ class MenuScreen extends StatelessWidget {
                               fontSize: 10,
                             ),
                           ),
-                          Row(
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               TextButton(
                                 onPressed: () => _launchUrl(privacyLink),
@@ -218,6 +266,19 @@ class MenuScreen extends StatelessWidget {
                                 ),
                                 child: Text(
                                   AppLocalizations.of(context).termsLabel,
+                                  style: theme.textTheme.labelMedium?.copyWith(color: legalColor),
+                                ),
+                              ),
+                              Text('/', style: theme.textTheme.labelMedium?.copyWith(color: legalColor)),
+                              TextButton(
+                                onPressed: () => _openAccessibilityDialog(context),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  AppLocalizations.of(context).accessibilityButton,
                                   style: theme.textTheme.labelMedium?.copyWith(color: legalColor),
                                 ),
                               ),

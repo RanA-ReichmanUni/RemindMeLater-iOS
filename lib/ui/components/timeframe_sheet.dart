@@ -217,67 +217,74 @@ class _TimeframeTile extends StatelessWidget {
 
     final String subtitle = timeframe.localizedSubtitle(context);
 
-    return GestureDetector(
-      onTap: onClick,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeInOut,
-        transform: Matrix4.identity()..scale(isSelected ? 1.02 : 1.0),
-        decoration: BoxDecoration(
-          color: isSelected ? colors.primaryContainer.withOpacity(0.9) : colors.surface,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: isSelected ? colors.primary : colors.outline.withOpacity(0.28),
-            width: 1.4,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: "${timeframe.localizedLabel(context)}, $subtitle",
+      hint: isSelected ? "Currently selected" : "Double tap to select ${timeframe.localizedLabel(context)}",
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onClick,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeInOut,
+          transform: Matrix4.identity()..scale(isSelected ? 1.02 : 1.0),
+          decoration: BoxDecoration(
+            color: isSelected ? colors.primaryContainer.withOpacity(0.9) : colors.surface,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: isSelected ? colors.primary : colors.outline.withOpacity(0.28),
+              width: 1.4,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: colors.primary.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
+                : null,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: colors.primary.withOpacity(0.08),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  )
-                ]
-              : null,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(timeframe.emoji, style: const TextStyle(fontSize: 24)),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  width: 32,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: isSelected ? colors.primary : colors.outline.withOpacity(0.25),
-                    borderRadius: BorderRadius.circular(100),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(timeframe.emoji, style: const TextStyle(fontSize: 24)),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    width: 32,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: isSelected ? colors.primary : colors.outline.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                timeframe.localizedLabel(context),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? colors.onPrimaryContainer : colors.onSurface,
                 ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              timeframe.localizedLabel(context),
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: isSelected ? colors.onPrimaryContainer : colors.onSurface,
               ),
-            ),
-            Text(
-              subtitle,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontSize: 11,
+              Text(
+                subtitle,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontSize: 11,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

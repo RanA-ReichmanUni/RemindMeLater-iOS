@@ -209,7 +209,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                                       textAlign: TextAlign.center,
                                       style: theme.textTheme.titleLarge?.copyWith(
                                         fontWeight: FontWeight.w500,
-                                        color: colors.onSurface.withOpacity(0.55),
+                                        color: colors.onSurfaceVariant,
                                         fontSize: 18,
                                       ),
                                     ),
@@ -291,51 +291,57 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                     SizedBox(height: interCardGap),
 
                     // Timing vibe Card
-                    Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                      color: colors.primaryContainer.withOpacity(0.22),
-                      elevation: 0,
-                      child: InkWell(
-                        onTap: () => _openTimeframeSheet(provider),
-                        borderRadius: BorderRadius.circular(28),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 34,
-                                height: 34,
-                                decoration: BoxDecoration(
-                                  color: colors.primary.withOpacity(0.12),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.schedule_outlined,
-                                  size: 18,
-                                  color: colors.primary,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context).timingVibeLabel,
-                                    style: theme.textTheme.labelLarge?.copyWith(
-                                      color: colors.onSurfaceVariant,
-                                    ),
+                    Semantics(
+                      button: true,
+                      label: "${AppLocalizations.of(context).timingVibeLabel}. Currently set to ${_selectedTimeframe.localizedLabel(context)}",
+                      hint: "Double tap to change the timing vibe",
+                      excludeSemantics: true,
+                      child: Card(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                        color: colors.primaryContainer.withOpacity(0.22),
+                        elevation: 0,
+                        child: InkWell(
+                          onTap: () => _openTimeframeSheet(provider),
+                          borderRadius: BorderRadius.circular(28),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    color: colors.primary.withOpacity(0.12),
+                                    shape: BoxShape.circle,
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    _selectedTimeframe.localizedLabel(context),
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: colors.onSurface,
-                                    ),
+                                  child: Icon(
+                                    Icons.schedule_outlined,
+                                    size: 18,
+                                    color: colors.primary,
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                const SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context).timingVibeLabel,
+                                      style: theme.textTheme.labelLarge?.copyWith(
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _selectedTimeframe.localizedLabel(context),
+                                      style: theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: colors.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -369,30 +375,36 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                           child: child,
                         );
                       },
-                      child: ElevatedButton(
-                        onPressed: _isTextEmpty ? null : () => _saveReminder(provider),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colors.primary,
-                          disabledBackgroundColor: colors.surfaceVariant,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          elevation: _isTextEmpty ? 0 : 8,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context).remindMeLaterBtn,
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
+                      child: Semantics(
+                        button: true,
+                        enabled: !_isTextEmpty,
+                        label: AppLocalizations.of(context).remindMeLaterBtn,
+                        hint: _isTextEmpty ? "Disabled until you type a reminder" : "Double tap to save this reminder",
+                        child: ElevatedButton(
+                          onPressed: _isTextEmpty ? null : () => _saveReminder(provider),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colors.primary,
+                            disabledBackgroundColor: colors.surfaceVariant,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            elevation: _isTextEmpty ? 0 : 8,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context).remindMeLaterBtn,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: _isTextEmpty ? colors.onSurfaceVariant : colors.onPrimary,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                Icons.check,
                                 color: _isTextEmpty ? colors.onSurfaceVariant : colors.onPrimary,
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.check,
-                              color: _isTextEmpty ? colors.onSurfaceVariant : colors.onPrimary,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -531,7 +543,9 @@ class _ChaosPadState extends State<_ChaosPad> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      height: widget.height,
+      constraints: BoxConstraints(
+        minHeight: widget.height,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -557,26 +571,30 @@ class _ChaosPadState extends State<_ChaosPad> {
         margin: EdgeInsets.zero,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
-          child: TextField(
-            controller: widget.controller,
-            focusNode: _focusNode,
-            maxLines: 5,
-            keyboardType: TextInputType.text,
-            textInputAction: TextInputAction.done,
-            style: widget.theme.textTheme.bodyLarge?.copyWith(
-              color: widget.colors.onSurface,
-              fontWeight: FontWeight.w500,
-            ),
-            cursorColor: widget.colors.primary,
-            decoration: InputDecoration(
-              hintText: AppLocalizations.of(context).dumpHintText,
-              hintStyle: widget.theme.textTheme.bodyLarge?.copyWith(
-                color: widget.colors.onSurfaceVariant.withOpacity(0.75),
+          child: Semantics(
+            label: AppLocalizations.of(context).dumpInputHeader,
+            textField: true,
+            child: TextField(
+              controller: widget.controller,
+              focusNode: _focusNode,
+              maxLines: 5,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.done,
+              style: widget.theme.textTheme.bodyLarge?.copyWith(
+                color: widget.colors.onSurface,
+                fontWeight: FontWeight.w500,
               ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
+              cursorColor: widget.colors.primary,
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context).dumpHintText,
+                hintStyle: widget.theme.textTheme.bodyLarge?.copyWith(
+                  color: widget.colors.onSurfaceVariant.withOpacity(0.75),
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+              ),
+              onSubmitted: (_) => _focusNode.unfocus(),
             ),
-            onSubmitted: (_) => _focusNode.unfocus(),
           ),
         ),
       ),
