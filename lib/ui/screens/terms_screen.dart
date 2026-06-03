@@ -26,8 +26,10 @@ class TermsScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    const String termsLink =
-        'https://doc-hosting.flycricket.io/remind-me-later-dump-forget-terms-and-conditions-agreement-ios-ipados-macos/b4e271d7-8ab2-4c34-9e7c-b29cef54cb9e/terms';
+    final isAndroid = theme.platform == TargetPlatform.android;
+    final String termsLink = isAndroid
+        ? 'https://doc-hosting.flycricket.io/remind-me-later-dump-forget-terms/066e5c03-811f-465e-9d68-99caef56d362/terms'
+        : 'https://doc-hosting.flycricket.io/remind-me-later-dump-forget-terms-and-conditions-agreement-ios-ipados-macos/b4e271d7-8ab2-4c34-9e7c-b29cef54cb9e/terms';
     const String privacyLink =
         'https://doc-hosting.flycricket.io/remind-me-later-dump-forget/26727942-d484-494a-a3b7-212119dfbe13/privacy';
 

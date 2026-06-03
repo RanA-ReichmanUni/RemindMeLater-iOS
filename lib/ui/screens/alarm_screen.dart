@@ -39,7 +39,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
 
   void _startRingtone() {
     try {
-      FlutterRingtonePlayer.play(
+      FlutterRingtonePlayer().play(
         android: AndroidSounds.alarm,
         ios: IosSounds.alarm,
         looping: true,
@@ -53,7 +53,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
 
   void _stopRingtone() {
     try {
-      FlutterRingtonePlayer.stop();
+      FlutterRingtonePlayer().stop();
     } catch (e) {
       // Catch gracefully
     }

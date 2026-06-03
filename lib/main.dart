@@ -18,6 +18,7 @@ import 'ui/screens/alarm_screen.dart';
 import 'ui/screens/menu_screen.dart';
 import 'ui/screens/update_wall_screen.dart';
 import 'ui/components/comfort_hours_sheet.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,6 +103,7 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
   @override
   void initState() {
     super.initState();
+    _checkForAndroidUpdates();
     // Listen to foreground alarm trigger events from clicks
     NotificationService.instance.alarmStream.listen((Reminder reminder) {
       if (mounted) {
@@ -135,6 +137,19 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
           _activeForegroundAlarm = reminder;
         });
         break; // Only trigger one alarm at a time
+      }
+    }
+  }
+
+  Future<void> _checkForAndroidUpdates() async {
+    if (Platform.isAndroid) {
+      try {
+        final updateInfo = await InAppUpdate.checkForUpdate();
+        if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+          await InAppUpdate.performImmediateUpdate();
+        }
+      } catch (e) {
+        debugPrint("[Main] InAppUpdate error: $e");
       }
     }
   }

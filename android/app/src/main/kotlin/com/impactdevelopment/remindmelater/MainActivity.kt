@@ -1,4 +1,4 @@
-package com.impactdevelopment.remind_me_later
+package com.impactdevelopment.remindmelater
 
 import io.flutter.embedding.android.FlutterActivity
 
