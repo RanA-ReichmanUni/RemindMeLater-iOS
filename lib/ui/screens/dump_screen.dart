@@ -155,6 +155,9 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
         final double bottomPadding = MediaQuery.of(context).padding.bottom;
         final double availableHeight = (constraints.maxHeight - topPadding - bottomPadding - 28.0).clamp(0.0, double.infinity);
 
+        // Detect keyboard open state
+        final bool keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 50;
+
         return Stack(
           children: [
             // Backdrop
@@ -162,18 +165,18 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
 
             // Foreground Content
             SafeArea(
-              child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: availableHeight,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14.0),
-                      child: Column(
+              child: AnimatedPadding(
+                duration: const Duration(milliseconds: 380),
+                curve: Curves.easeInOutCubic,
+                padding: EdgeInsets.only(
+                  top: keyboardOpen ? 14.0 : (availableHeight * 0.22).clamp(14.0, 140.0),
+                  bottom: 14.0,
+                  left: 18.0,
+                  right: 18.0,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
                   children: [
-                    const Spacer(flex: 3),
-
                     // Hero title tile + input, visually fused
                     Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
@@ -347,7 +350,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                       ),
                     ),
 
-                    const Spacer(flex: 1),
+                    SizedBox(height: interCardGap),
 
                     // Remind Me Later Glow Button
                     AnimatedBuilder(
@@ -419,14 +422,12 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
                       ),
                     ],
 
-                    const Spacer(flex: 2),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
             ),
           ),
-        ),
-      ),
 
             // Success overlay
             if (_showSuccess)
