@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:remind_me_later/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../models/timeframe.dart';
@@ -23,6 +24,7 @@ class DumpScreen extends StatefulWidget {
 
 class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   Timeframe _selectedTimeframe = Timeframe.nextFewDays;
   bool _ignoreComfortHours = false;
   bool _showSuccess = false;
@@ -83,6 +85,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
   void dispose() {
     _textController.removeListener(_onTextChanged);
     _textController.dispose();
+    _scrollController.dispose();
     _pulseController.dispose();
     super.dispose();
   }
@@ -94,6 +97,19 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
     provider.addReminder(text, _selectedTimeframe, ignoreComfortHours: _ignoreComfortHours);
     _textController.clear();
     _ignoreComfortHours = false;
+    
+    FocusScope.of(context).unfocus();
+
+    // Add a small delay for Android 10 keyboard dismiss layout changes
+    Future.delayed(const Duration(milliseconds: 120), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 380),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
 
     setState(() {
       _showSuccess = true;
@@ -168,15 +184,24 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
               child: AnimatedPadding(
                 duration: const Duration(milliseconds: 380),
                 curve: Curves.easeInOutCubic,
-                padding: EdgeInsets.only(
-                  top: keyboardOpen ? 14.0 : (availableHeight * 0.22).clamp(14.0, 140.0),
+                padding: const EdgeInsets.only(
+                  top: 56.0,
                   bottom: 14.0,
-                  left: 18.0,
-                  right: 18.0,
+                  left: 0.0,
+                  right: 0.0,
                 ),
                 child: SingleChildScrollView(
-                  child: Column(
+                  controller: _scrollController,
+                  clipBehavior: Clip.hardEdge,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                    child: Column(
                   children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 380),
+                      curve: Curves.easeInOutCubic,
+                      height: 0.0,
+                    ),
                     // Hero title tile + input, visually fused
                     Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
@@ -428,6 +453,7 @@ class _DumpScreenState extends State<DumpScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
+        ),
 
             // Success overlay
             if (_showSuccess)
@@ -578,6 +604,11 @@ class _ChaosPadState extends State<_ChaosPad> {
             child: TextField(
               controller: widget.controller,
               focusNode: _focusNode,
+              onTap: () {
+                if (_focusNode.hasFocus) {
+                  SystemChannels.textInput.invokeMethod('TextInput.show');
+                }
+              },
               maxLines: 5,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.done,

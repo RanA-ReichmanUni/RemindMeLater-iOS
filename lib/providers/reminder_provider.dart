@@ -18,6 +18,7 @@ class ReminderProvider with ChangeNotifier {
   bool _termsAccepted = false;
   bool _backgroundAnimationsEnabled = true;
   int _acceptedTermsVersion = 0; // version of terms user last agreed to
+  bool _isLoading = true;
 
   // Getters
   List<Reminder> get reminders => _reminders;
@@ -26,6 +27,7 @@ class ReminderProvider with ChangeNotifier {
   bool get hasOnboarded => _hasOnboarded;
   bool get termsAccepted => _termsAccepted;
   bool get backgroundAnimationsEnabled => _backgroundAnimationsEnabled;
+  bool get isLoading => _isLoading;
 
   /// True when the user hasn't accepted terms yet (fresh install),
   /// OR when kTermsVersion has been bumped since they last agreed.
@@ -41,6 +43,8 @@ class ReminderProvider with ChangeNotifier {
   Future<void> _init() async {
     await refreshSettings();
     await refreshReminders();
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> refreshSettings() async {

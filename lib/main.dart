@@ -19,12 +19,10 @@ import 'ui/screens/menu_screen.dart';
 import 'ui/screens/update_wall_screen.dart';
 import 'ui/components/comfort_hours_sheet.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'config/app_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize services
-  await NotificationService.instance.init();
 
   bool needsUpdate = false;
   try {
@@ -44,6 +42,13 @@ void main() async {
       child: RemindMeLaterApp(needsUpdate: needsUpdate),
     ),
   );
+
+  // Initialize notification service AFTER the UI is running to avoid
+  // deadlocks on older Android versions (e.g. Android 10) where
+  // requesting permissions before the engine is active can hang the app.
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await NotificationService.instance.init();
+  });
 }
 
 class RemindMeLaterApp extends StatelessWidget {
@@ -54,6 +59,16 @@ class RemindMeLaterApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ReminderProvider>(
       builder: (context, provider, child) {
+        // Don't render the app until the provider has loaded from disk.
+        // This prevents a white frame on slow/older devices.
+        if (provider.isLoading) {
+          return const MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: SizedBox.shrink(),
+            ),
+          );
+        }
         return MaterialApp(
           title: 'Remind Me Later',
           debugShowCheckedModeBanner: false,
@@ -66,7 +81,7 @@ class RemindMeLaterApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
+          supportedLocales: kEnableTranslations ? const [
             Locale('en'),
             Locale('es'),
             Locale('fr'),
@@ -74,6 +89,8 @@ class RemindMeLaterApp extends StatelessWidget {
             Locale('ja'),
             Locale('zh'),
             Locale('he'),
+          ] : const [
+            Locale('en'),
           ],
           home: MainOrchestrator(needsUpdate: needsUpdate),
         );

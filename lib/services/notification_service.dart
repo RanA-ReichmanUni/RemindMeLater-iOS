@@ -236,7 +236,11 @@ class NotificationService {
   }
 
   Future<void> cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+    try {
+      await flutterLocalNotificationsPlugin.cancel(id);
+    } catch (e) {
+      debugPrint('[NotificationService] ERROR cancelling notification $id: $e');
+    }
   }
 
   Future<void> _handleNotificationResponse(NotificationResponse response) async {

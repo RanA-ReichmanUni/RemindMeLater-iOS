@@ -8,3 +8,8 @@
 /// Users who last agreed on an older terms version will be shown
 /// the terms screen again with no Cancel option.
 const int kTermsVersion = 2;
+
+/// Whether to enable multi-language translations for the app.
+/// If true, the app will translate to the device's locale (if supported).
+/// If false, the app will always be presented in the default language (English).
+const bool kEnableTranslations = false;
