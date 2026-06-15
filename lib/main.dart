@@ -39,7 +39,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ReminderProvider()),
       ],
-      child: RemindMeLaterApp(needsUpdate: needsUpdate),
+      child: RemindMeLaterApp(initialNeedsUpdate: needsUpdate),
     ),
   );
 
@@ -52,8 +52,8 @@ void main() async {
 }
 
 class RemindMeLaterApp extends StatelessWidget {
-  final bool needsUpdate;
-  const RemindMeLaterApp({super.key, required this.needsUpdate});
+  final bool initialNeedsUpdate;
+  const RemindMeLaterApp({super.key, required this.initialNeedsUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +92,7 @@ class RemindMeLaterApp extends StatelessWidget {
           ] : const [
             Locale('en'),
           ],
-          home: MainOrchestrator(needsUpdate: needsUpdate),
+          home: MainOrchestrator(initialNeedsUpdate: initialNeedsUpdate),
         );
       },
     );
@@ -100,8 +100,8 @@ class RemindMeLaterApp extends StatelessWidget {
 }
 
 class MainOrchestrator extends StatefulWidget {
-  final bool needsUpdate;
-  const MainOrchestrator({super.key, required this.needsUpdate});
+  final bool initialNeedsUpdate;
+  const MainOrchestrator({super.key, required this.initialNeedsUpdate});
 
   @override
   State<MainOrchestrator> createState() => _MainOrchestratorState();
@@ -109,17 +109,21 @@ class MainOrchestrator extends StatefulWidget {
 
 enum AppTab { dump, reminders }
 
-class _MainOrchestratorState extends State<MainOrchestrator> {
+class _MainOrchestratorState extends State<MainOrchestrator>
+    with WidgetsBindingObserver {
   AppTab _selectedTab = AppTab.dump;
   String? _prefillText;
   bool _showMenu = false;
   Reminder? _activeForegroundAlarm;
   bool _playSiren = false;
   Timer? _foregroundPollTimer;
+  late bool _needsUpdate;
 
   @override
   void initState() {
     super.initState();
+    _needsUpdate = widget.initialNeedsUpdate;
+    WidgetsBinding.instance.addObserver(this);
     _checkForAndroidUpdates();
     // Listen to foreground alarm trigger events from clicks
     NotificationService.instance.alarmStream.listen((Reminder reminder) {
@@ -140,6 +144,32 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
     _foregroundPollTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       _checkForegroundAlarms();
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _refreshUpdateStatus();
+    }
+  }
+
+  /// Re-fetch Remote Config from the server and update the update-wall
+  /// state.  This runs every time the user brings the app back to the
+  /// foreground, so a newly published Remote Config value takes effect
+  /// without reinstalling.
+  Future<void> _refreshUpdateStatus() async {
+    try {
+      final bool required =
+          await RemoteConfigService.instance.forceRefresh();
+      if (mounted && required != _needsUpdate) {
+        setState(() {
+          _needsUpdate = required;
+        });
+      }
+    } catch (e) {
+      debugPrint("[Main] _refreshUpdateStatus failed: $e");
+    }
   }
 
   void _checkForegroundAlarms() {
@@ -173,6 +203,7 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _foregroundPollTimer?.cancel();
     super.dispose();
   }
@@ -184,7 +215,7 @@ class _MainOrchestratorState extends State<MainOrchestrator> {
     final colors = theme.colorScheme;
 
     // ── 0. If update is required, show Update Wall Screen ──
-    if (widget.needsUpdate) {
+    if (_needsUpdate) {
       return const UpdateWallScreen();
     }
 
