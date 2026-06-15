@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +14,7 @@ import 'ui/screens/terms_screen.dart';
 import 'ui/screens/dump_screen.dart';
 import 'ui/screens/reminders_screen.dart';
 import 'ui/screens/alarm_screen.dart';
+import 'ui/screens/missed_screen.dart';
 import 'ui/screens/menu_screen.dart';
 import 'ui/screens/update_wall_screen.dart';
 import 'ui/components/comfort_hours_sheet.dart';
@@ -107,7 +107,7 @@ class MainOrchestrator extends StatefulWidget {
   State<MainOrchestrator> createState() => _MainOrchestratorState();
 }
 
-enum AppTab { dump, reminders }
+enum AppTab { dump, reminders, missed }
 
 class _MainOrchestratorState extends State<MainOrchestrator>
     with WidgetsBindingObserver {
@@ -116,7 +116,6 @@ class _MainOrchestratorState extends State<MainOrchestrator>
   bool _showMenu = false;
   Reminder? _activeForegroundAlarm;
   bool _playSiren = false;
-  Timer? _foregroundPollTimer;
   late bool _needsUpdate;
 
   @override
@@ -125,24 +124,27 @@ class _MainOrchestratorState extends State<MainOrchestrator>
     _needsUpdate = widget.initialNeedsUpdate;
     WidgetsBinding.instance.addObserver(this);
     _checkForAndroidUpdates();
-    // Listen to foreground alarm trigger events from clicks
+
+    // Listen to explicit notification taps
     NotificationService.instance.alarmStream.listen((Reminder reminder) {
       if (mounted) {
         setState(() {
-          _playSiren = false;
+          _playSiren = false; // It already played the notification sound
           _activeForegroundAlarm = reminder;
         });
+      }
+    });
+
+    // Listen to background actions (Done/Snooze) to reload UI
+    NotificationService.instance.actionStream.listen((_) {
+      if (mounted) {
+        Provider.of<ReminderProvider>(context, listen: false).refreshReminders();
       }
     });
 
     // Handle alarms triggered when app was completely closed
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationService.instance.consumePendingLaunchAlarm();
-    });
-
-    // Start a periodic timer to catch alarms if the app is already open
-    _foregroundPollTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      _checkForegroundAlarms();
     });
   }
 
@@ -151,6 +153,9 @@ class _MainOrchestratorState extends State<MainOrchestrator>
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       _refreshUpdateStatus();
+      if (mounted) {
+        Provider.of<ReminderProvider>(context, listen: false).refreshReminders();
+      }
     }
   }
 
@@ -172,22 +177,6 @@ class _MainOrchestratorState extends State<MainOrchestrator>
     }
   }
 
-  void _checkForegroundAlarms() {
-    if (!mounted || _activeForegroundAlarm != null) return;
-    final provider = Provider.of<ReminderProvider>(context, listen: false);
-    final now = DateTime.now().millisecondsSinceEpoch;
-
-    for (final reminder in provider.reminders) {
-      if (reminder.status == ReminderStatus.pending && reminder.scheduledAt <= now) {
-        setState(() {
-          _playSiren = true;
-          _activeForegroundAlarm = reminder;
-        });
-        break; // Only trigger one alarm at a time
-      }
-    }
-  }
-
   Future<void> _checkForAndroidUpdates() async {
     if (Platform.isAndroid) {
       try {
@@ -204,7 +193,6 @@ class _MainOrchestratorState extends State<MainOrchestrator>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _foregroundPollTimer?.cancel();
     super.dispose();
   }
 
@@ -219,7 +207,7 @@ class _MainOrchestratorState extends State<MainOrchestrator>
       return const UpdateWallScreen();
     }
 
-    // ── 1. If foreground alarm active, show Alarm Screen ──
+    // ── 1. If user explicitly tapped a notification, show Alarm Screen ──
     if (_activeForegroundAlarm != null) {
       return AlarmScreen(
         reminder: _activeForegroundAlarm!,
@@ -228,6 +216,8 @@ class _MainOrchestratorState extends State<MainOrchestrator>
           setState(() {
             _activeForegroundAlarm = null;
           });
+          // Also refresh the missed tab just in case they ignored it
+          provider.refreshReminders();
         },
       );
     }
@@ -290,6 +280,7 @@ class _MainOrchestratorState extends State<MainOrchestrator>
                 },
               ),
               const RemindersScreen(),
+              const MissedScreen(),
             ],
           ),
 
@@ -338,6 +329,9 @@ class _PremiumBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final provider = Provider.of<ReminderProvider>(context);
+    final missedCount = provider.firedCount;
+    final warmAccent = Color.lerp(colors.error, Colors.orange, 0.45)!;
 
     return Container(
       margin: const EdgeInsets.only(left: 14, right: 14, bottom: 18, top: 10),
@@ -375,6 +369,20 @@ class _PremiumBottomBar extends StatelessWidget {
                 selectedIcon: Icons.notifications,
                 isSelected: selectedTab == AppTab.reminders,
                 onClick: () => onTabSelected(AppTab.reminders),
+                colors: colors,
+                theme: theme,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _BadgedNavItem(
+                label: 'Missed',
+                icon: Icons.inbox_outlined,
+                selectedIcon: Icons.inbox,
+                isSelected: selectedTab == AppTab.missed,
+                badgeCount: missedCount,
+                badgeColor: warmAccent,
+                onClick: () => onTabSelected(AppTab.missed),
                 colors: colors,
                 theme: theme,
               ),
@@ -433,6 +441,118 @@ class _PremiumNavItem extends StatelessWidget {
                 isSelected ? selectedIcon : icon,
                 size: (isSelected ? 22 : 20) * textScale.clamp(1.0, 1.4),
                 color: isSelected ? colors.primary : colors.onSurfaceVariant,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? colors.primary : colors.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (isSelected)
+                Text(
+                  '•',
+                  style: TextStyle(
+                    color: colors.primary,
+                    height: 0.6,
+                    fontSize: 10 * textScale.clamp(1.0, 1.4),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BadgedNavItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+  final bool isSelected;
+  final int badgeCount;
+  final Color badgeColor;
+  final VoidCallback onClick;
+  final ColorScheme colors;
+  final ThemeData theme;
+
+  const _BadgedNavItem({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+    required this.isSelected,
+    required this.badgeCount,
+    required this.badgeColor,
+    required this.onClick,
+    required this.colors,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final double textScale = MediaQuery.textScalerOf(context).scale(1.0);
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '$label, $badgeCount items',
+      hint: isSelected ? "Currently active tab" : "Double tap to switch to $label tab",
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onClick,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          height: 54 * textScale.clamp(1.0, 1.8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? colors.primaryContainer.withOpacity(0.45)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    isSelected ? selectedIcon : icon,
+                    size: (isSelected ? 22 : 20) * textScale.clamp(1.0, 1.4),
+                    color: isSelected ? colors.primary : colors.onSurfaceVariant,
+                  ),
+                  if (badgeCount > 0)
+                    Positioned(
+                      right: -8,
+                      top: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: badgeColor,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$badgeCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              height: 1,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 2),
               Text(

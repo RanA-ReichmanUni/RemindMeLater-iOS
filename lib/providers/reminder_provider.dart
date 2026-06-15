@@ -12,6 +12,7 @@ class ReminderProvider with ChangeNotifier {
   final NotificationService _notifications = NotificationService.instance;
 
   List<Reminder> _reminders = [];
+  List<Reminder> _firedReminders = [];
   int _comfortStart = 9;
   int _comfortEnd = 21;
   bool _hasOnboarded = false;
@@ -22,6 +23,8 @@ class ReminderProvider with ChangeNotifier {
 
   // Getters
   List<Reminder> get reminders => _reminders;
+  List<Reminder> get firedReminders => _firedReminders;
+  int get firedCount => _firedReminders.length;
   int get comfortStart => _comfortStart;
   int get comfortEnd => _comfortEnd;
   bool get hasOnboarded => _hasOnboarded;
@@ -59,6 +62,7 @@ class ReminderProvider with ChangeNotifier {
 
   Future<void> refreshReminders() async {
     _reminders = await _db.getActiveReminders();
+    _firedReminders = await _db.getFiredReminders();
     notifyListeners();
   }
 

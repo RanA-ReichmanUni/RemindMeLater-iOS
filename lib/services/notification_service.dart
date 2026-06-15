@@ -17,26 +17,34 @@ import 'settings_service.dart';
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+  tz.initializeTimeZones();
+
   final String? payload = notificationResponse.payload;
   if (payload == null) return;
   final int? reminderId = int.tryParse(payload);
   if (reminderId == null) return;
+
+  // The background isolate is a separate Dart environment — we must initialize
+  // the plugin here before using cancel/schedule.
+  final plugin = FlutterLocalNotificationsPlugin();
+  const AndroidInitializationSettings initSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  await plugin.initialize(
+    const InitializationSettings(android: initSettingsAndroid),
+  );
 
   final db = DatabaseHelper.instance;
   final settings = SettingsService.instance;
 
   if (notificationResponse.actionId == 'action_done') {
     await db.updateReminderStatus(reminderId, ReminderStatus.done);
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    await flutterLocalNotificationsPlugin.cancel(reminderId);
+    await plugin.cancel(reminderId);
   } else if (notificationResponse.actionId == 'action_snooze') {
     final reminder = await db.getReminderById(reminderId);
     if (reminder != null) {
       final comfortStart = await settings.getComfortStart();
       final comfortEnd = await settings.getComfortEnd();
-      
+
       // Snooze = Later Today
       final newTime = computeRandomTime(Timeframe.laterToday, comfortStart, comfortEnd);
       final updated = reminder.copyWith(
@@ -44,12 +52,37 @@ void notificationTapBackground(NotificationResponse notificationResponse) async 
         scheduledAt: newTime,
         status: ReminderStatus.pending,
       );
-      
+
       await db.updateReminder(updated);
-      await NotificationService.instance.scheduleNotification(updated);
+      await plugin.cancel(reminderId); // Dismiss the active notification
+
+      // Schedule the snoozed reminder directly (avoids uninitialized singleton)
+      final fireTime = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.local, newTime);
+      await plugin.zonedSchedule(
+        updated.id!,
+        'Reminder 🔔',
+        updated.text,
+        fireTime,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'reminders_channel_v2',
+            'Reminders',
+            channelDescription: 'Dump & Forget Reminders',
+            importance: Importance.max,
+            priority: Priority.high,
+            sound: RawResourceAndroidNotificationSound('soft_arrival_3sec'),
+            fullScreenIntent: true,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: updated.id.toString(),
+      );
     }
   }
 }
+
 
 class NotificationService {
   static final NotificationService instance = NotificationService._init();
@@ -60,7 +93,12 @@ class NotificationService {
   final StreamController<Reminder> _alarmStreamController =
       StreamController<Reminder>.broadcast();
 
+  // Controller for background actions (Done/Snooze) to tell UI to reload
+  final StreamController<String> _actionStreamController =
+      StreamController<String>.broadcast();
+
   Stream<Reminder> get alarmStream => _alarmStreamController.stream;
+  Stream<String> get actionStream => _actionStreamController.stream;
 
   Reminder? pendingLaunchAlarm;
 
@@ -93,22 +131,6 @@ class NotificationService {
     final List<DarwinNotificationCategory> darwinNotificationCategories = [
       DarwinNotificationCategory(
         'reminder_category',
-        actions: <DarwinNotificationAction>[
-          DarwinNotificationAction.plain(
-            'action_done',
-            '✓ Done',
-            options: <DarwinNotificationActionOption>{
-              DarwinNotificationActionOption.foreground,
-            },
-          ),
-          DarwinNotificationAction.plain(
-            'action_snooze',
-            '💤 Snooze (Later today)',
-            options: <DarwinNotificationActionOption>{
-              DarwinNotificationActionOption.foreground,
-            },
-          ),
-        ],
         options: <DarwinNotificationCategoryOption>{
           DarwinNotificationCategoryOption.hiddenPreviewShowTitle,
         },
@@ -190,16 +212,14 @@ class NotificationService {
 
       const AndroidNotificationDetails androidNotificationDetails =
           AndroidNotificationDetails(
-        'reminders_channel',
+        'reminders_channel_v2',
         'Reminders',
         channelDescription: 'Dump & Forget Reminders',
         importance: Importance.max,
         priority: Priority.high,
         ticker: 'ticker',
-        actions: <AndroidNotificationAction>[
-          AndroidNotificationAction('action_done', '✓ Done'),
-          AndroidNotificationAction('action_snooze', '💤 Snooze'),
-        ],
+        sound: RawResourceAndroidNotificationSound('soft_arrival_3sec'),
+        fullScreenIntent: true,
       );
 
       const DarwinNotificationDetails iosNotificationDetails =
@@ -254,6 +274,7 @@ class NotificationService {
     if (response.actionId == 'action_done') {
       await DatabaseHelper.instance.updateReminderStatus(reminderId, ReminderStatus.done);
       await flutterLocalNotificationsPlugin.cancel(reminderId);
+      if (_actionStreamController.hasListener) _actionStreamController.add('reload');
     } else if (response.actionId == 'action_snooze') {
       final db = DatabaseHelper.instance;
       final settings = SettingsService.instance;
@@ -268,7 +289,9 @@ class NotificationService {
           status: ReminderStatus.pending,
         );
         await db.updateReminder(updated);
+        await flutterLocalNotificationsPlugin.cancel(reminderId); // Clear active notification
         await scheduleNotification(updated);
+        if (_actionStreamController.hasListener) _actionStreamController.add('reload');
       }
     } else {
       // Normal click — trigger app alarm screen if reminder is pending

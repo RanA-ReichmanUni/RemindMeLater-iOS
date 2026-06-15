@@ -282,6 +282,12 @@ class _ReminderCardState extends State<_ReminderCard> {
     }
   }
 
+  String _formatDebugDate(int timestamp) {
+    if (timestamp == 0) return 'Not scheduled';
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
   void _showHandledConfirm(BuildContext context) {
     showDialog(
       context: context,
@@ -369,6 +375,15 @@ class _ReminderCardState extends State<_ReminderCard> {
                         style: widget.theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: widget.colors.onSurface,
+                        ),
+                      ),
+                      // Temporary Debug element:
+                      const SizedBox(height: 4),
+                      Text(
+                        'Scheduled for: ${_formatDebugDate(widget.reminder.scheduledAt)}',
+                        style: widget.theme.textTheme.labelSmall?.copyWith(
+                          color: widget.colors.error,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],

@@ -232,6 +232,54 @@ class MenuScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 14),
 
+                      // Test Tools Card
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          side: BorderSide(
+                            color: colors.error.withOpacity(0.5),
+                            width: 1.0,
+                          ),
+                        ),
+                        color: colors.surface,
+                        elevation: 0,
+                        borderOnForeground: true,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                "Debug Tools",
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colors.error,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  provider.scheduleInOneMinute('Debug 1 Min Test');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Test alarm scheduled in 1 minute')),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colors.errorContainer,
+                                  foregroundColor: colors.onErrorContainer,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.bug_report, size: 18),
+                                label: const Text('Fire Test Alarm (1 Min)'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+
                       // Legal Section
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

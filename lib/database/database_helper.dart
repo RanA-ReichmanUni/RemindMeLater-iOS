@@ -63,9 +63,25 @@ class DatabaseHelper {
 
   Future<List<Reminder>> getActiveReminders() async {
     final db = await instance.database;
+    final now = DateTime.now().millisecondsSinceEpoch;
     final result = await db.query(
       'reminders',
-      where: "status = 'PENDING' OR status = 'SNOOZED'",
+      where: "(status = 'PENDING' OR status = 'SNOOZED') AND scheduledAt > ?",
+      whereArgs: [now],
+      orderBy: 'scheduledAt ASC',
+    );
+    return result.map((json) => Reminder.fromMap(json)).toList();
+  }
+
+  /// Returns reminders that have already fired (past scheduledAt) but
+  /// the user has not yet marked them as handled.
+  Future<List<Reminder>> getFiredReminders() async {
+    final db = await instance.database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final result = await db.query(
+      'reminders',
+      where: "status = 'PENDING' AND scheduledAt <= ?",
+      whereArgs: [now],
       orderBy: 'scheduledAt ASC',
     );
     return result.map((json) => Reminder.fromMap(json)).toList();
